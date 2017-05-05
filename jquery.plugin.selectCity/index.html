@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="js/jquery-1.12.4.js"></script>
+		<link rel="stylesheet" href="css/city-picker.css" />
+	</head>
+	
+	<body>
+		下拉列表：<input  id="select" class="select"  style="width:200px;height:20px;" />------------------
+		下拉列表：<input class="select" id="select2" style="width:200px;height:20px;" />
+		<script src="js/city_select.js"></script>
+		<script>
+			
+			$(function(){
+				$("#select").selectCity({
+					showDistrict : false
+				});
+				
+				$("#select2").selectCity({
+					showDistrict : false
+				});
+			})
+		</script>
+	</body>
+</html>
