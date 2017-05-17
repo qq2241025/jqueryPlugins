@@ -70,14 +70,15 @@
 	}
 	
 	var resetBodyDiv = function(mask){
+		var cacheData = $("body").data("data.mask");
+		var msgDiv    = cacheData["maskMsg"];
+		var loadMask  = cacheData["loadMask"];
 		var scroll = function(){
 			 //浏览器可视区域的高度
 			 var browserHeight = $(window).height();
 			 var browserWidth = $(window).width();
 			 var scrollTop = $(window).scrollTop();
 			 var scrollLeft = $(window).scrollLeft();
-			 var cacheData = $("body").data("data.mask");
-			 var msgDiv    = cacheData["maskMsg"];
 			 var msgWidth  = $(msgDiv).width();
       		 var posTop  = browserHeight/2 + scrollTop;
       		 var posLeft = (browserWidth-msgWidth)/2 + scrollLeft;
@@ -85,6 +86,10 @@
 		}
 	    $(window).scroll(scroll);
 	    $(window).resize(scroll);
+	    if(loadMask){
+	        loadMask.css("height",$(document).height());
+//			loadMask.css("position","fixed");
+	    }
 	    scroll();
 	}
 	//
