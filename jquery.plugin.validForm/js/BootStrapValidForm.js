@@ -1,6 +1,286 @@
-(function($){	/**	 * hzg 	 */	var ToolTips= function(element, opt){		  var defaultOpt = {		        name: 'toolTip', 			    align: 'right', 			    padding: 4,			    radius: 2, 			    opacity: 0.8, 			    iconSize : 6,			    maxWidth: 222,			    textColor:"#fff",			    content : "tip提示",			    offsetSize: 3,			    bgColor: '#000',			    dataTipName: "plugin.tooltip"		   };		   this.option = $.extend({},defaultOpt, opt);	       this.init(element, this.option);	       return this;	};	ToolTips.prototype={	    init:function(element, option){		   var bgColor  = option["bgColor"];		   var name     = option["name"];		   var content  = option["content"];		   var iconSize = option["iconSize"];		   var opacity  = option["opacity"];		   var maxWidth = option["maxWidth"];		   var padding  = option["padding"];		   var radius   = option["radius"];		   var textColor= option["textColor"];		   this.itemElement = $(element);		   this.targetId = this.getUUId();		   var htmlcode = ['<div class="toolTip" id="'+this.targetId+'" name="'+this.targetId+'"'];		   htmlcode.push(' style="z-index:1; position:absolute; opacity:'+opacity+'; background:'+bgColor+'; max-width:'+maxWidth+'px; padding:'+padding+'px; border-radius:'+radius+'px;">');	       htmlcode.push('	<div class="toolTip-innerDiv" style="position:absolute; border:solid transparent '+iconSize+'px;width:0;height:0;"></div>');	       htmlcode.push('	<div class="toolTip-Text" style="color:'+textColor+'; font-size:12px; background:transparent;">'+content+'</div>');	       htmlcode.push('</div>');	       this.toolTips = $(htmlcode.join(""));	       this.showTip();	    }, 	    getOptions:function(){	    		return this.option;	    },	    getTargetItem:function(){	        return this.itemElement;	    },	    getUUId : function(){		    function S4() { return (((1+Math.random())*0x10000)|0).toString(16).substring(1).toUpperCase(); }    			return (S4()+S4()+S4()+S4()+S4()+S4()+S4()+S4());   		},	    getTipElement:function(){	       return this.toolTips;	    },	    getTargetId:function(){	       return this.targetId;	    },	    setContent: function(text){	      var content = this.getTipElement().find('.toolTip-Text');	      content.html(text);	      this.updatePostion();	    },	    updatePostion:function(){	        var tipWidth  = this.getTipElement()[0].offsetWidth; 	        var tipHeight = this.getTipElement()[0].offsetHeight; 	        var eleEWidth = this.itemElement[0].offsetWidth; 	        var eleHeight = this.itemElement[0].offsetHeight;	        this.offset(tipWidth, tipHeight, eleEWidth, eleHeight);	    }, 	    showTip:function(){	    	//判断缓存	    	var data = $(this.itemElement).data(this.option["dataTipName"]);	    	if(data){	    		data.getTipElement().remove();	    	}	        this.getTipElement().css({ display: 'block'});	        $(this.itemElement).after(this.getTipElement());		    this.updatePostion();		    $(this.itemElement).data(this.option["dataTipName"],this); //设置缓存	    },	    closeTip:function(){	       this.getTipElement().remove();	       $(this.itemElement).removeData(this.option["dataTipName"]);	    },	    destroy:function(){	    	this.closeTip();	    },	    show:function(){	        this.getTipElement().css({opacity: 1, visibility: 'visible'});	        return this;	    },	    hide:function(){	        this.getTipElement().css({visibility: 'hidden'});	        return this;	    },	    offset: function(TipWidth, TipHeight, elementWidth, elementHeight){		      var tipDiv = this.getTipElement(); 		      var elementOffset = this.itemElement.offset();		      var innerDiv = this.getTipElement().find('.toolTip-innerDiv'); 		      var option = this.getOptions();		      var offsetSize = option["offsetSize"] ; //偏移位置		      var iconSize =option["iconSize"]; //三角大小		      switch(option["align"]){		        case 'left':		          //三角		          var innerTop  = parseInt((TipHeight - iconSize * 2 )/2 ); //ok 		          var innerleft = -iconSize * 2 ;		          innerDiv.css({right:innerleft, top: innerTop,borderLeftColor: option["bgColor"]});		          //div位置		          var divTop  = parseInt(elementOffset.top +  (elementHeight - TipHeight)/2);		          var divLeft = parseInt(elementOffset.left - TipWidth - iconSize- offsetSize);		          tipDiv.css({left: divLeft, top: divTop});		          return ;		        case 'right':		          //三角		          var innerTop = parseInt((TipHeight - iconSize*2 )/2 );		          var innerleft = -iconSize * 2 ;		          innerDiv.css({left:innerleft, top: innerTop,borderRightColor: option["bgColor"]});		          //div位置		          var divTop  = parseInt(elementOffset.top +  (elementHeight - TipHeight)/2);		          var divLeft = parseInt(elementOffset.left +  elementWidth + iconSize+ offsetSize) ;		          tipDiv.css({left: divLeft, top: divTop});		          return ;		        case 'bottom':		          //三角		          var innerLeft = parseInt((TipWidth - iconSize*2 )/2 );		          var innerTop = -iconSize * 2 ;		          innerDiv.css({left:innerLeft, top: innerTop,borderBottomColor: option["bgColor"]});		          //div位置		          var divLeft = parseInt(elementOffset.left +  (elementWidth - TipWidth) / 2);		          var divTop = elementOffset.top + elementHeight +  iconSize + offsetSize ;		          tipDiv.css({left: divLeft, top: divTop});		          return ;		        case 'top':		        default:		          //三角		          var innerLeft = parseInt((TipWidth - iconSize*2 )/2 );		          var innerTop =  -iconSize*2 ;		          innerDiv.css({left:innerLeft, bottom: innerTop,borderTopColor: option["bgColor"]});		          //div位置		          var divLeft = parseInt(elementOffset.left +  (elementWidth - TipWidth) / 2);		          var divTop = elementOffset.top - TipHeight - iconSize - offsetSize;		          tipDiv.css({left: divLeft, top: divTop});		          return ;		      }		    }	};
-	$.fn.TooltipPlugin = function(option){		return this.each(function () {			var data= $(this).data('plugin.tooltip');			var options = typeof option == 'object' ? option:{};      		if (!data){      			 data = new ToolTips(this, options);      		}       		if (typeof option == 'string' && data[option]){      			data[option]();      		} 		});	}	})(jQuery);
-$(function(){    var dataName = "input.validTip";
-	//定义一个验证器	$.Validator={		toolTipLists:{},		inValidList :[],		match:function(params) {			//定义默认的验证规则			var rule = params["rule"].toUpperCase(),value = params["value"],regString=params["regString"];			var defaultVal = {				NUMBER : "^[0-9]*$",				DOUBLE : /^[-\+]?\d+(\.\d+)?$/,				TEL : "^0(10|2[0-5789]|\\d{3})-\\d{7,8}$",				IP : "^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])\\.){3}(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])$",				MOBILE : "^1(3[0-9]|5[0-35-9]|8[0235-9])\\d{8}$",				EMAIL : "^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$",				MAIL  : "^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$",				IDENTITY : /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/,				CHINESE : "^[\\u4E00-\\u9FA5\\uF900-\\uFA2D]*$",				URL : "^http[s]?://[\\w\\.\\-]+$"			};			if(!value){			     return false;			}			var flag=false,ruleText = defaultVal[rule];			if(rule =='OTHER') {//自定义的验证规则匹配				flag=new RegExp(regString).test(value);			}else if(ruleText){			    var reg = new RegExp(ruleText);				flag=  reg.test(value);			}			return flag;		},		getTextWidth:function(str,fontSize) {			  var fontSize = fontSize || 12;			  var textDom = $('<span stlye="display:none;" id="getTextWidth" style="font-Size:'+fontSize+'px;white-space: nowrap;">'+text+'</span>');			  $('body').append(textDom); 			  var width = textDom[0].offsetWidth;			  textDom.remove();		      return width;		},		showErrorTip:function(target){			 var align   = $(target).attr("placement") || 'right';        	 var bgColor = $(target).attr("tipColor") || "#000";        	 var title  = $(this).attr("title");			 if(title){	           $(target).attr("title",'');	           $(target).attr("msg",title);	         }	         var msg = $(target).attr("msg") || $(target).attr("title") || "不能为空" ;		 	 var option = {		 	    align: align,		    	bgColor: bgColor,		    	content: msg		 	 };			 return $(target).TooltipPlugin(option);		},		closeAllTip:function(){			var list = this.getFormItemList();			if(list && list.length >0){				 $.each(list,function(index, target) {			        $(target).TooltipPlugin("destroy");				 });			}		},		getInValidList : function(){		   return this.inValidList;		},		//显示错误的tip样式		invalidFormErrorTip:function(target){			$(target).css({backgroundColor:"#ffe7e7",border:"1px solid #a5aeb6"});		},		//清除TIP样式		clearFormtErrorTip:function(target){			$(target).css({backgroundColor:"",border:""});		},		getFormItemList:function(){			return this.formItemList;		},		bindFormEvent:function(target){		     var me= this;		     $(target).unbind('input propertychange');		     $(target).bind('input propertychange', function(){		         me.invalFormItem(this);		     });		},		//验证		checkValidItem:function(target){		    var qtip = null,flag = false;			var value = $(target).val();			var valTypeRule = $(target).attr('valType'),regString   = $(target).attr('regString');			var maxLength   = $(target).attr('maxChart') || 0,vlength  = value.length  || 0;			if(value){				 //自定义正则表达式				if(valTypeRule == 'other') { 					flag = $.Validator.match({rule:"other",value:value,regString:regString}); //				}else if(valTypeRule == 'required'){ //正则表达式验证				    flag = true;				}else{				   flag =  $.Validator.match({rule:valTypeRule,value:value});				}			}		    return flag;		},		invalFormItem:function(target){		 	this.clearFormtErrorTip(target);		 	$(target).TooltipPlugin("destroy");		 	var flag= this.checkValidItem(target); //控件的验证方法	    	if(!flag){		        this.invalidFormErrorTip(target); //显示错误的样式	            var tips= this.showErrorTip(target);	            $(target).data(dataName,tips);		    }		    return flag;		},		validateForm:function(list) {			 this.formItemList = list;			 var me = this;			 var falg = true;			 if(!list || list.length == 0 ){			 	return false;			 }			 var validForm={};			 $.each(list,function(index, target) {		        var isValid= me.invalFormItem(target);		        me.bindFormEvent(target);		        validForm[index] = isValid;			 });			 for(var key in validForm){			 	var valid = validForm[key];			 	if(!valid){			 		falg = false;			 		break;			 	}			 }			 return falg;		},		showTip: function(target,option){			 option= option||{};			 var opt= {align:"right",bgColor:"#000",content:"tip信息提示"};			 option = $.extend({},opt, option);			 var title = $(target).attr("title");			 if(title){	            $(target).attr("title",'');	            $(target).attr("msg",title);	         }	         var content = $(target).attr("msg");			 var align   = option["align"]   || $(target).attr("placement") ;	    	 var bgColor = option["bgColor"] || $(target).attr("tipColor");	    	 var trigger = option["trigger"] || "hover"; 			 option["content"] = content;			 option["bgColor"] = bgColor;			 option["align"] = align;			 var qtip = null;			 $(target).hover(function(){			 	  qtip= $(target).TooltipPlugin(option);			 },function(){			 	if(qtip){			 	    $(target).TooltipPlugin("destroy");			 	}			 })			 return qtip;		},		//tip滑动提示		hideTip:function(target){			$(target).TooltipPlugin("destroy");		}	}	//为jquery扩展一个doValidate方法，对所有带有valType的元素进行表单验证，可用于ajax提交前自动对表单进行验证	$.extend({		doValidate: function() {			var list  = $("[valType]");			return $.Validator.validateForm(list);		},		closeAllToolTip:function(){			$.Validator.closeAllTipDom();		}	});		$.fn.doValidate=function(){        var list  = $(this).find("[valType]");		var flag  = $.Validator.validateForm(list);		return flag;	}	$.fn.showTip = function(option){        var target = $(this);		return $.Validator.showTip(target,option);	}	$.fn.hideTip = function(){		return $.Validator.hideTip($(this));	}});
-
-
+(function($){
+    /**
+	 * hzg 
+	 */
+	var setContent = function(target,text){
+		var dataToolTip = $(target).data("plugin.tooltip");
+		if(dataToolTip && dataToolTip["toolTips"]){
+		   var toolTips = dataToolTip["toolTips"];
+		   var content = toolTips.find('.toolTip-Text');
+	       content.html(text);
+	       updatePostion(target,toolTips);
+		}
+	}
+	var showTip= function(target,toolTips){
+        target.show();
+        $(target).after(toolTips);
+	    updatePostion(target,toolTips);
+	}
+	var destroy = function(target){
+		var dataToolTip = $(target).data("plugin.tooltip");
+		if(dataToolTip && dataToolTip["toolTips"]){
+			dataToolTip["toolTips"].remove();
+			$(target).removeData("plugin.tooltip");
+		}
+	}
+	var hide = function(target){
+		var dataToolTip = $(target).data("plugin.tooltip");
+		if(dataToolTip && dataToolTip["toolTips"]){
+			$(dataToolTip["toolTips"]).hide();
+		}
+	}
+	var show = function(target){
+		var dataToolTip = $(target).data("plugin.tooltip");
+		if(dataToolTip && dataToolTip["toolTips"]){
+			$(dataToolTip["toolTips"]).show();
+		}
+	}
+	var updatePostion= function(target,toolTips){
+		  toolTips = $(toolTips),target = $(target);
+		  var opts = $(target).data("plugin.tooltip").options;
+		  var TipWidth  = toolTips[0].offsetWidth,TipHeight = toolTips[0].offsetHeight; 
+	      var elementWidth = target[0].offsetWidth,elementHeight = target[0].offsetHeight;
+	      var elementOffset = target.offset();
+	      var innerDiv = toolTips.find('.toolTip-innerDiv'); 
+	      var offsetSize = opts["offsetSize"],iconSize= opts["iconSize"]; //三角大小
+	      switch(opts["align"]){
+	        case 'left':
+	          //三角
+	          var innerTop  = parseInt((TipHeight - iconSize * 2 )/2 ); //ok 
+	          var innerleft = -iconSize * 2 ;
+	          innerDiv.css({right:innerleft, top: innerTop,borderLeftColor: opts["bgColor"]});
+	          //div位置
+	          var divTop  = parseInt(elementOffset.top +  (elementHeight - TipHeight)/2);
+	          var divLeft = parseInt(elementOffset.left - TipWidth - iconSize- offsetSize);
+	          toolTips.css({left: divLeft, top: divTop});
+	          return ;
+	        case 'right':
+	          //三角
+	          var innerTop = parseInt((TipHeight - iconSize*2 )/2 );
+	          var innerleft = -iconSize * 2 ;
+	          innerDiv.css({left:innerleft, top: innerTop,borderRightColor: opts["bgColor"]});
+	          //div位置
+	          var divTop  = parseInt(elementOffset.top +  (elementHeight - TipHeight)/2);
+	          var divLeft = parseInt(elementOffset.left +  elementWidth + iconSize+ offsetSize) ;
+	          toolTips.css({left: divLeft, top: divTop});
+	          return ;
+	        case 'bottom':
+	          //三角
+	          var innerLeft = parseInt((TipWidth - iconSize*2 )/2 );
+	          var innerTop = -iconSize * 2 ;
+	          innerDiv.css({left:innerLeft, top: innerTop,borderBottomColor: opts["bgColor"]});
+	          //div位置
+	          var divLeft = parseInt(elementOffset.left +  (elementWidth - TipWidth) / 2);
+	          var divTop = elementOffset.top + elementHeight +  iconSize + offsetSize ;
+	          toolTips.css({left: divLeft, top: divTop});
+	          return ;
+	        case 'top':
+	        default:
+	          //三角
+	          var innerLeft = parseInt((TipWidth - iconSize*2 )/2 );
+	          var innerTop =  -iconSize*2 ;
+	          innerDiv.css({left:innerLeft, bottom: innerTop,borderTopColor: opts["bgColor"]});
+	          //div位置
+	          var divLeft = parseInt(elementOffset.left +  (elementWidth - TipWidth) / 2);
+	          var divTop = elementOffset.top - TipHeight - iconSize - offsetSize;
+	          toolTips.css({left: divLeft, top: divTop});
+	          return ;
+	      }
+    };
+	var initToolTip= function(target, opt){
+		  var opts = $.extend({},$.fn.toolTips.default, opt);
+		  var textContent = $(target).attr("title") || $(target).attr("dataTitle");
+		  if(!textContent){
+		  	  textContent = $(target).attr("msg") || opts["content"];
+		  }else{
+		  	 $(target).attr("dataTitle",textContent);
+		  	 $(target).attr("title","");
+		  }
+		  var htmlcode = '<div class="toolTip"  name="toolTip"><div class="toolTip-innerDiv"></div><div class="toolTip-Text" >'+textContent+'</div></div>';
+	      var toolTips = $(htmlcode);
+	      toolTips.css({position:"absolute",opacity:opts["opacity"],background:opts["bgColor"],maxWidth:opts["maxWidth"],padding:opts["padding"],borderRadius:opts["radius"]});
+	      toolTips.find("div.toolTip-innerDiv").css({position:"absolute",border:"solid transparent " + opts["iconSize"] +"px",width:"0px",height:"0px"});
+	      toolTips.find("div.toolTip-Text").css({color:opts["textColor"],fontSize:"12px",background:"transparent"});
+	      var data = $.data(target, 'plugin.tooltip');
+	      if(!data){
+	      	  opts["target"] = toolTips;
+			  $(target).data("plugin.tooltip",{
+			  		options : opts,
+					toolTips : toolTips
+			  })
+		      showTip(target,toolTips);
+	      }
+	};
+	$.fn.toolTips = function(options, param){
+		if (typeof options == 'string'){
+			var methodFn = $.fn.toolTips.method;
+			if(methodFn[options] && $.isFunction(methodFn[options])){
+				return methodFn[options](this, param);
+			}else{
+				throw options + " method is not find";
+			}
+			return null;
+		}
+		options = options || {};
+		return this.each(function(){
+      		initToolTip($(this), options);
+		});
+	};
+	$.fn.toolTips.default = {
+		name: 'toolTip', 
+	    align: 'right', 
+	    padding: 4,
+	    radius: 2, 
+	    opacity: 0.8, 
+	    iconSize : 6,
+	    maxWidth: 222,
+	    textColor:"#fff",
+	    content : "tip提示",
+	    offsetSize: 3,
+	    bgColor: '#000'
+	}
+	$.fn.toolTips.method = {
+		 setContent:function(target,param){
+		 	return target.each(function(){
+		 		setContent(this,param);
+		 	});
+		 },
+		 show:function(){
+		 	return target.each(function(){
+		 		show(this);
+		 	});
+		 },
+		 hide: function(){
+		 	return target.each(function(){
+		 		hide(this);
+		 	});
+		 },
+		 destroy:function(target){
+		 	return target.each(function(){
+		 		destroy(this);
+		 	});
+		 }
+	}
+
+})(jQuery);
+
+
+$(function(){
+	//定义一个验证器
+	$.Validator={
+		match:function(params) {
+			//定义默认的验证规则
+			var rule = params["rule"].toUpperCase(),value = params["value"];
+			var defaultVal = {
+				NUMBER : "^[0-9]*$",
+				TEL : "^0(10|2[0-5789]|\\d{3})-\\d{7,8}$",
+				IP : "^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])\\.){3}(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])$",
+				MOBILE : "^1(3[0-9]|5[0-35-9]|8[0235-9])\\d{8}$",
+				EMAIL : "^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$",
+				MAIL  : "^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$",
+				IDENTITY : "((11|12|13|14|15|21|22|23|31|32|33|34|35|36|37|41|42|43|44|45|46|50|51|52|53|54|61|62|63|64|65|71|81|82|91)\\d{4})((((19|20)(([02468][048])|([13579][26]))0229))|((20[0-9][0-9])|(19[0-9][0-9]))((((0[1-9])|(1[0-2]))((0[1-9])|(1\\d)|(2[0-8])))|((((0[1,3-9])|(1[0-2]))(29|30))|(((0[13578])|(1[02]))31))))((\\d{3}(x|X))|(\\d{4}))",
+				CHINESE : "^[\\u4E00-\\u9FA5\\uF900-\\uFA2D]*$",
+				URL : "^http[s]?://[\\w\\.\\-]+$"
+			};
+			if(!value){
+			     return false;
+			}
+			var flag=false,ruleText = defaultVal[rule];
+			if(rule =='OTHER') {//自定义的验证规则匹配
+				var regString = params["regString"];
+				flag=new RegExp(regString).test(value);
+			}else if(ruleText){
+			    var reg=new RegExp(ruleText);
+				flag =reg.test(value);
+			}
+			return flag;
+		},
+		getTextWidth:function(str,fontSize) {
+			  var fontSize = fontSize || 12;
+			  var textDom = $('<span stlye="display:none;" id="getTextWidth" style="font-Size:'+fontSize+'px;white-space: nowrap;">'+text+'</span>');
+			  $('body').append(textDom); 
+			  var width = textDom[0].offsetWidth;
+			  textDom.remove();
+		      return width;
+		},
+		//显示错误的tip样式
+		invalidFormErrorTip:function(target){
+			$(target).css({backgroundColor:"#ffe7e7",border:"1px solid #a5aeb6"});
+		},
+		//清除TIP样式
+		clearFormtErrorTip:function(target){
+			$(target).css({backgroundColor:"",border:""});
+		},
+		//绑定form样式
+		bindItemFormEvent:function(target){
+		     var me= this;
+		     if(target && target.length >0){
+		     	var tagType = $(target).prop("tagName");
+		     	var eventType = "SELECT" != tagType ? "input propertychange":"change";
+		     	$(target).unbind(eventType).bind(eventType, function(){
+		           me.invalFormItem($(this));
+		     	});
+		     }
+		},
+		//验证
+		checkValidItem:function(target){
+		    var flag = false;
+			var inValue = $(target).val() || "";
+			if(inValue){
+				 //自定义正则表达式
+				var valTypeRule = $(target).attr('valType');
+				if(valTypeRule == 'other') { 
+					var regString = $(target).attr('regString');
+					flag = $.Validator.match({rule:"other",value:inValue,regString:regString}); //
+				}else if(valTypeRule == 'required'){ //正则表达式验证
+				    flag = true;
+				}else{
+				    flag =  $.Validator.match({rule:valTypeRule,value:inValue});
+				}
+			}
+		    return flag;
+		},
+		//验证无效的表单
+		invalFormItem:function(target){
+			this.clearFormtErrorTip(target); //清除错误的样式
+		    $(target).toolTips("destroy");
+		 	var option = {
+		 	    align: $(target).attr("placement") || 'right',
+		    	bgColor: $(target).attr("tipColor") || "#000"
+		 	};
+		 	var flag= this.checkValidItem(target); //控件的验证方法
+	    	if(!flag){
+		        this.invalidFormErrorTip(target); //显示错误的样式
+	            $(target).toolTips(option);
+		    }
+		    return flag;
+		},
+		//验证From
+		validateForm:function(list) {
+			 var me = this,falg = true;
+			 if(list && list.length == 0 ){
+			 	return false;
+			 }
+			 list.each(function(index,target) {
+			 	target = $(target);
+		        falg = me.invalFormItem(target);
+		        me.bindItemFormEvent(target);
+			 });
+			 return falg;
+		},
+		//tip滑动提示
+		hideTip:function(target){
+			$(target).toolTips("destroy");
+		}
+	}
+	//为jquery扩展一个doValidate方法，对所有带有valType的元素进行表单验证，可用于ajax提交前自动对表单进行验证
+	$.extend({
+		doValidate: function() {
+			var list  = $("[valType]");
+			return $.Validator.validateForm(list);
+		},
+		closeAllToolTip:function(){
+			$.Validator.closeAllTipDom();
+		}
+	});
+});
