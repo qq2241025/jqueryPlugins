@@ -1,0 +1,200 @@
+
+.animated {
+	animation-duration: 0.5s;
+	animation-fill-mode: both;
+} 
+.zoomIn {
+	animation-name: zoomIn;
+} 
+@keyframes zoomIn {
+	0%{opacity: 0;transform: scale3d(0.3, 0.3, 0.3);}
+	50%{opacity: 1;} 
+} 
+.emptyData {
+	width:100%;
+    height:100%;
+    background-color:white;
+    background-image: url("../images/nodata-bg.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.loadLoadMsg {
+   width:100%;
+   height:100%;
+   background-color: #FFFFFF;
+   background-image: url("../images/loadMsg.gif");
+   background-repeat: no-repeat;
+   background-position: center center;
+}
+.btn.checkedView{
+	background-color: #00acd6;
+    border-color: #00acd6;
+}
+
+.fileContiner{
+	padding:5px 10px 20px 5px;
+}
+.fileBox{
+	vertical-align: top;
+    float: none;
+    height: auto;
+	display:inline-block;
+	border:1px solid transparent;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0);
+    color:#335;
+    width:100px;
+    overflow: hidden;
+    text-decoration: none;
+    margin: 0px 5px 10px 5px;
+    cursor: pointer;
+}
+
+.fileBox > .fileIcon{
+    height:70px;
+    width:100%;
+}
+.x-item-file{
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+    width: 100%;
+}
+.fileBox > .fileName {
+    cursor: default;
+    font-size: 1em;
+    line-height: 1.5em;
+    margin: 0 auto;
+    padding-bottom: 5px;
+    text-align: center;
+    word-break: break-all;
+}
+.fileContiner{
+	padding: 10px 5px 10px 15px;
+}
+.x-disk{
+	background:url(../images/disk.png) no-repeat center center;
+}
+.x-folder{
+	background:url(../images/folder.png) no-repeat center center;
+}
+.x-file{
+	background:url(../images/file.png) no-repeat center center;
+}
+.x-item-file.small {
+    background-size:24px 24px;
+}
+.x-item-file.middle {
+    background-size:64px 64px;
+}
+.listHeader{
+	background: #fff none repeat scroll 0 0;
+    border-bottom: 1px solid #e3e3e3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    width:100%;
+    height:30px;
+    line-height: 30px;
+}
+.listHeader > div{
+    color: #448;
+    cursor: pointer;
+    float: left;
+    font-size: 1em;
+    height: 100%;
+    padding-left: 10px;
+}
+
+.listBody .listBox{
+	background: #fff none repeat scroll 0 0;
+    border-bottom: 1px solid #e3e3e3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    width:100%;
+    height: 35px;
+    line-height: 35px;
+}
+.listBox > div{
+    color: #448;
+    cursor: pointer;
+    float: left;
+    font-size: 1em;
+    height: 100%;
+    float:left;
+	display: inline-block;
+    padding-left: 10px;
+}
+.fileBox:hover , .listBox:hover{
+	background: #EEEEEE none repeat scroll 0 0;
+}
+
+
+.listFileNum{
+	width: 60px;
+}
+.listFileName{
+	width: 310px;
+	position: relative;
+}
+.listFileType{
+	width: 120px;
+}
+
+.listFileSize{
+	width: 120px;
+}
+.listFileTime{
+	width: 170px;
+}
+
+.listFileContainer{
+	width: 100%;
+	height:100%;
+}
+.listFileName > .childMore{
+	height:35px;
+	width: 35px;
+}
+.listFileName > .listFileIcon{
+    height: 32px;
+    width: 32px;
+    padding: 0px;
+    float:left;
+    line-height: 32px;
+    text-align: center;
+    vertical-align: center;
+}
+.listFileName > .listFileText{
+   float: left;
+}
+.listFileName > .processBar{
+   vertical-align: center;
+   position: absolute;
+   padding-left:20px;
+   top:14px;
+   right:50px;
+}
+
+
+
+.space_process{
+	background-color: #ddd;
+    border-radius: 5px;
+    height: 6px;
+    margin: 0;
+    overflow: hidden;
+    width: 110px;
+}
+.space_process > .space_process_use{
+	background-color: #428bca;
+    border-radius: 5px;
+    height: 100%;
+    transition: all 0.2s ease 0s;
+}
+
+
+
+
+
+
+
+
+
+

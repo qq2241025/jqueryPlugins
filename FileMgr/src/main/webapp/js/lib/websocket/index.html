@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+   <head>
+   	 <title>WebSocket Chat Client</title>
+   	 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   	 <script type="text/javascript" src="jquery-1.10.2.min.js"></script>
+   	 <script type="text/javascript" src="websocket/swfobject.js"></script>
+	 <script type="text/javascript" src="websocket/web_socket.js"></script>
+     <script type='text/javascript'>
+		WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+	    WEB_SOCKET_DEBUG = true;
+	    var ws;
+	    var loginId = "";
+	    var loginCode = "";
+	    var openType = 1;
+	    function doWebsocket() {
+	      ws = new WebSocket("ws://192.168.2.71:8888:9898/");
+	      ws.onopen = function() {
+	        	output("onopen");
+	      };
+	      ws.onmessage = function(e) {
+	    	  var data = e.data;
+	          console.info("receive data " + e.data);
+	          data = $.parseJSON(data);
+	          var type = data["type"];
+	          var msgData = data["msg"];
+	          if(type == "init"){
+	        	  $('#msg').html('<div style="color:green">已连接上 socket</div>');
+		          $('#msg').append('<div style="color:green">SocketId: ' + data["connectId"] + '</div>');
+		          $('#connect_status').html('Connected Success !');
+		          $('#connect_status').css('color', 'green');
+		          $("#Connect").attr("disabled",true);
+		          getSelectUserList(msgData); 
+	        	  return ;
+	          }
+	          //群发处理
+	          if(type == "sendall"){
+	        	 $("#recevieAllContent").append("<span style='color:blue;'>receive:"+msgData+"</span><br/>");
+	        	  return ;
+	          }
+	          
+	          //群发处理
+	          if(type == "sendall"){
+	        	 $("#recevieAllContent").append("<span style='color:blue;'>receive:"+msgData+"</span><br/>");
+	        	  return ;
+	          }
+	          
+	          //单独发送
+	          if(type == "sendone"){
+	        	 $("#getOneContent").append("<span style='color:green;'>receive:"+msgData+"</span><br/>");
+	        	  return ;
+	          }
+	          
+	          //获取yoghurt列表
+	          if(type == "connects"){
+	        	  if(openType==2){
+	        		  showUserList(msgData);
+	        	  }else{
+	        		  showSelectUser(msgData);
+	        	  }
+	        	  return ;
+	          }
+	      };
+	      ws.onclose = function() {
+	          output("<span style='color:red;'>onclose</span>");
+	      };
+	      ws.onerror = function() {
+	        output("onerror");
+	      };
+	    }
+	    
+	    //群发消息
+	    function sendAllMsg() {
+	      var input = $("#All_content").val();
+	      var msg = '{"type":"sendall","data":"'+input+'"}';
+	      if(input){
+	    	  ws.send(msg);
+	    	  $("#sentAllContent").append("<span style='color:blue;'>I am send:</span> " + input+"<br/>");
+	      }
+	    }
+	    
+	    function getAllUserList() {
+	    	 openType = 2;
+	    	 var login = '{"type":"connects"}';
+	    	 ws.send(login);
+		}
+	    
+	    function getSelectUserList() {
+	    	 openType = 1;
+	    	 var login = '{"type":"connects"}';
+	    	 ws.send(login);
+		}
+	    
+		function sendOne() {
+			 var input = $("#one_content").val();
+			 var connectId = $("#userSelect").val();
+			 if(connectId && input){
+				 var login = '{"type":"sendone","data":"'+input+'","connectId":"'+connectId+'"}';
+		    	 ws.send(login);
+		    	 $("#sentOneContent").append("<span style='color:blue;'>I am send:</span> " + login+"<br/>");
+			 }
+		}
+	    
+	    
+	    
+	   function showUserList(list){
+		   if(list && list.length > 0){
+			   for (var i = 0; i < list.length; i++) {
+				   var connectId =list[i]["connectId"];
+				   $("#userList").append("connectId:"+connectId+"<br/>");
+			   }
+		   }
+	   }
+	   
+	   function showSelectUser(list){
+		   if(list && list.length > 0){
+			   for (var i = 0; i < list.length; i++) {
+				   var connectId =list[i]["connectId"];
+				   $("#userSelect").append("<option value='"+connectId+"'>websocket-"+i+"</option>");
+			   }
+		   }
+	   }
+	    
+	    
+	    
+	    function closeWs() {
+	    	  $('#msg').html('<div style="color:green">Wsocket断开连接 </div>');
+	          $('#connect_status').html('disConnected !');
+	          $('#connect_status').css('color', 'red');
+	          $("#Connect").attr("disabled",false);
+	          if(ws){
+	        	  ws.close();
+	          }
+	    }
+	    
+	    function output(res) {
+	      console.warn(res);
+	    }
+	    
+	    function GetRequest() {
+	    	   var url = location.search; //获取url中"?"符后的字串
+	    	   var theRequest = {};
+	    	   if (url.indexOf("?") != -1) {
+	    	      var str = url.substr(1);
+	    	      strs = str.split("&");
+	    	      for(var i = 0; i < strs.length; i ++) {
+	    	         theRequest[strs[i].split("=")[0]]=(strs[i].split("=")[1]);
+	    	      }
+	    	   }
+	    	   return theRequest;
+	   }
+	    $(document).ready(function(){
+	    	var parasm = GetRequest();
+	    	loginCode = parasm["loginCode"];
+	    	doWebsocket();
+		});
+     </script>
+  </head>
+  <body>
+     <div id="websocket" >
+        
+        <div>
+	        <div style="float:left;width:50%">
+				  <fieldset style="height:100px;">
+				    	<legend>WebSocket Info</legend>
+				    	<div id="msg"></div>
+				  </fieldset>
+			</div>
+			<div style="float:left;width:50%">
+				  <fieldset style="height:100px;">
+				    	<legend>Connect & Disconnect</legend>
+				   	 	<input type="button" value="Connect" id="Connect" onclick="doWebsocket()"/>
+				    	<input type="button" value="Disconnect" onclick="closeWs()"/>
+				  </fieldset>
+			</div>
+        </div>
+        
+        
+        <div>
+	        <div style="float:left;width:50%">
+				  <div style="float:left;width:100%">
+				    <fieldset id="topic_list" style="height:200px;overflow:auto">
+				      <legend>我发送的群消息:</legend>
+				      <input type="text" placeholder="发送消息" id="All_content" value=""/>
+					  <input type="button" value="发送群消息" onclick="sendAllMsg()"/>
+					  <br/>
+				      <div style="height:150px;width:100%;border:1px solid #e5e5e5;" id="sentAllContent"></div>
+				    </fieldset>
+				  </div>
+			</div>
+			<div style="float:left;width:50%">
+				  <div style="float:left;width:100%">
+				    <fieldset id="topic_list" style="height:200px;overflow:auto">
+				      <legend>我收到群消息:</legend>
+				      <div style="height:150px;width:100%;border:1px solid #e5e5e5;" id="recevieAllContent"></div>
+				    </fieldset>
+				  </div>
+			</div>
+        </div>
+        
+        
+        
+        <div>
+	        <div style="float:left;width:50%">
+				  <div style="float:left;width:100%">
+				    <fieldset id="topic_list" style="height:200px;overflow:auto">
+				      <legend>我单独收到消息:</legend>
+				            用户：  <select id="userSelect"><option value="">请选择</option></select>
+				      <input type="text" placeholder="发送消息" id="one_content" value=""/>
+					  <input type="button" value="发送群消息" onclick="sendOne()"/>
+					  <br/>
+				      <div style="height:150px;width:100%;border:1px solid #e5e5e5;" id="sentOneContent"></div>
+				    </fieldset>
+				  </div>
+			</div>
+			<div style="float:left;width:50%">
+				  <div style="float:left;width:100%">
+				    <fieldset id="topic_list" style="height:200px;overflow:auto">
+				      <legend>我收到的消息:</legend>
+				      <div style="height:150px;width:100%;border:1px solid #e5e5e5;" id="getOneContent"></div>
+				    </fieldset>
+				  </div>
+			</div>
+        </div>
+        
+        
+        
+         <div>
+	        <div style="float:left;width:50%">
+				  <div style="float:left;width:100%">
+				    <fieldset id="topic_list" style="height:200px;overflow:auto">
+				      <legend>在线用户列表</legend>
+				      <input type="button" value="获取在线列表" onclick="getAllUserList()"/>
+					  <br/>
+				      <div style="height:150px;width:100%;border:1px solid #e5e5e5;" id="userList"></div>
+				    </fieldset>
+				  </div>
+			</div>
+        </div>
+        
+        
+     
+  </body>
+</html>

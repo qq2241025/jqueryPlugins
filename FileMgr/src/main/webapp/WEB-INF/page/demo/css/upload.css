@@ -1,0 +1,9 @@
+@CHARSET "UTF-8"; 
+*{ padding:0px; margin:0px;}
+a{ text-decoration:none;}
+ul{ list-style-type:none;}
+.boxshow{ float:left; position:relative; padding:1px; top:10%;  opacity:0.5;z-index:4;  opacity:1; }
+.box_bg{}
+.box2{ width:100%; height:100%; margin:0 auto; display:none; z-index:5; position:fixed; background:rgba(0, 0, 0, 0.52) none repeat scroll 0% 0%; opacity:1;}
+.login5{ width:1050px; height:0px; background:#b52200; text-align:center; position:relative; margin:50px auto 0px auto;}
+.login51{ width:1050px;  margin:0 auto;background-color:#fff; height:550px; }
