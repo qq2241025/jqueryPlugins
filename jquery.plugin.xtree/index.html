@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layer-更懂你的web弹窗解决方案</title>
+  <script src="js/jquery-1.12.4.js"></script>
+  <script src="js/jquery.tree.source.js"></script>
+  <link rel="stylesheet" href="css/default.css" />
+</head>
+<body>
+  <div class="easyui-panel" style="padding:5px">
+ 		<ul id="tt"></ul>
+	</div>
+	<div style="margin-left: 120px;;">
+			<button onclick="getParent()">getParent</button>
+			<button onclick="getChecked()">getChecked</button>
+			<button onclick="getSelectNode()">getSelectNode</button>
+			
+			<button onclick="isLeaf()">isLeaf</button>
+			<button onclick="select()">select</button>
+			
+			<button onclick="collapse()" class="button">collapse</button>
+			<button onclick="expandNode()" class="button">expand</button>
+			<button onclick="toggle()" class="button">toggle</button>
+			
+			<button onclick="append()" class="button">append</button>
+			
+			<button onclick="removeNode()" class="button">removeNode</button>
+			<button onclick="getRoots()" class="button">getRoot</button>
+			
+			
+			<button onclick="loadData()" class="button">loadData</button>
+			<button onclick="getChildren()" class="button">getChildren</button>
+			<button onclick="getChildrenNode()" class="button">getChildrenNode</button>
+			
+			<button onclick="expandToNode()" class="button">expandTo</button>
+			
+			
+			<br />
+			<button onclick="scrollTo()" id="scrollTo">scrollTo</button>
+			
+			
+			<br />
+			<br /><br /><br />
+			<span class="toolTips" msg="哈哈对额快A" dataTitle="aaaaaaa" title="cccccccc">哈哈对额快A</span>
+			<br /><br /><br />
+	    <span class="toolTips" msg="哈哈对额快B" id="aaaaaa" dataTitle="bbbbb">哈哈对额快B</span>
+	    <br /><br />
+	    
+	    <button onclick="setTipContent()" id="scrollTo">测试toolTip setContent方法</button>
+	    
+	
+	</div>
+	
+	
+	
+	<script type="text/javascript">
+	    var data = [{
+						"id":1,
+						"text":"My Documents",
+						"iconCls":"icon-add",
+						"children":[{
+							"id":11,
+							"text":"Photos",
+							"iconCls":"icon-add",
+							"state":"closed",
+							"children":[{
+								"id":111,
+								"text":"Friend"
+							},{
+								"id":112,
+								"text":"Wife"
+							},{
+								"id":113,
+								"text":"Company"
+							}]
+						},{
+							"id":12,
+							"text":"Program Files",
+							"iconCls":"icon-add",
+							"children":[{
+								"id":121,
+								"iconCls":"icon-add",
+								"text":"Intel"
+							},{
+								"id":122,
+								"text":"Java",
+								"attributes":{
+									"p1":"Custom Attribute1",
+									"p2":"Custom Attribute2"
+								}
+							},{
+								"id":123,
+								"text":"Microsoft Office"
+							},{
+								"id":124,
+								"text":"Games",
+								"checked":true
+							}]
+						},{
+							"id":13,
+							"text":"index.html"
+						},{
+							"id":14,
+							"text":"about.html"
+						},{
+							"id":15,
+							"text":"welcome.html",
+							"children":[{
+								"id":1212,
+								"iconCls":"icon-add",
+								"text":"Intel"
+							},{
+								"id":15151,
+								"text":"Java",
+								"attributes":{
+									"p1":"Custom Attribute1",
+									"p2":"Custom Attribute2"
+								}
+							}]
+						}]
+					}];
+		  $('#tt').tree({
+		  		data: data,
+		  		checkbox: false,
+		  		lines: true,
+		  		onClick: function(node) {
+		  			console.log("onClick",node);
+		  		},
+					onCollapse: function(node) {
+		  			console.log("onCollapse",node);
+		  		},
+					onBeforeCollapse: function(node) {
+		  			console.log("onBeforeCollapse",node);
+//		  			return false;
+		  		},
+					onExpand: function(node) {
+		  			console.log("onExpand",node);
+		  		},
+		  		onMouseOver:function(node){
+		  		//	console.log("onMouseOver",node);
+		  		},
+		  		onMouseOut:function(node){
+		  			//console.log("onMouseOut",node);
+		  		},
+					onBeforeExpand: function(node) {
+		  			//console.log("onBeforeExpand",node);
+//		  			return false;
+		  		},
+					onCheck: function(node) {
+		  			console.log("onCheck",node);
+		  		},
+		  		formatter:function(node){
+		  			var nodeText = node["text"];
+		  			return nodeText;
+		  		}
+		  });
+		  
+		  
+		 
+		 var getSelectNode = function(){
+		 	  var node = $('#tt').tree('getSelected');
+		 	  console.log(node);
+		 	  return node;
+		 }
+		 
+		 
+		 setTipContent = function(){
+		 		$("#scrollTo").toolTips("setContent","狗日的");
+		 		$(".toolTips").toolTips("setContent","狗日的,还钱");
+		 }
+		
+		 var getParent = function(){
+		 	  var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+		 	  var parentNode = $('#tt').tree("getParent",node.target);
+		 	  console.log(parentNode);
+		 }
+		 
+		 var getChecked  =function(){
+		 		var node = $('#tt').tree("getChecked");
+		 		console.log("getChecked",node);
+		 }
+		 
+		 var isLeaf = function(){
+		   	var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+		 	  var isleaf = $('#tt').tree("isLeaf",node.target);
+		 	  alert("isLeaf=="+isleaf);
+		 }
+		 
+		 function select(){
+		 		var select = $('#tt').tree("select");
+		 		console.log(select);
+		 }
+		 
+		 function append(){
+				var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+				$('#tt').tree('append',{
+					parent: node.target,
+					data:[{
+							text:'新的节点列表',
+							iconCls:"icon-add",
+							state:'closed',
+							children:[{
+								text:'新的节点A',
+								iconCls:"icon-add",
+								checked:true
+							},{
+								text:'新的节点B',
+								iconCls:"icon-add"
+							},{
+								text:'新的节点C',
+								iconCls:"icon-add"
+							}]
+						}]
+				});
+		}
+		 
+		 function removeNode(){
+				var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+				$('#tt').tree('remove', node.target);
+		}
+		 
+		var collapse = function(){
+				var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+		 	  $('#tt').tree('collapse', node.target);
+		}
+		
+		
+		var expandNode = function(){
+				var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+		 	  $('#tt').tree('expand', node.target);
+		}
+		
+		
+		var toggle = function(){
+				var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+		 	  $('#tt').tree('toggle', node.target);
+		}
+		
+		
+		var getRoots = function(){
+		 	 var roots =  $('#tt').tree('getRoots');
+		 	 console.log(roots);
+		}
+		
+		var getChildren = function(){
+		 	 var roots =  $('#tt').tree('getChildren');
+		 	 console.log(roots);
+		}
+		
+		var getChildrenNode = function(){
+		 	  var node = getSelectNode();
+		 	  if(!node){
+		 	  	alert("请选择一个节点");
+		 	  	return ;
+		 	  }
+		 	  var roots =  $('#tt').tree('getChildren',node.target);
+		 	  console.log(roots,roots.length);
+		}
+		
+		
+		function collapseAll(){
+			$('#tt').tree('collapseAll');
+		}
+		function expandAll(){
+			$('#tt').tree('expandAll');
+		}
+		function expandToNode(){
+			  var node = $('#tt').tree('find',112);
+			  console.log(node);
+		 	  if(!node){
+		 	  	alert("没有找到该节点");
+		 	  	return ;
+		 	  }
+			  $('#tt').tree('expandTo', node.target);
+		}
+		var loadData = function(){
+			
+			var data = [{
+					text:'新的节点列表',
+					iconCls:"icon-add",
+					state:'closed',
+					children:[{
+							text:'新的节点B',
+							iconCls:"icon-add"
+						},{
+							text:'新的节点C',
+							iconCls:"icon-remove"
+						},{
+							text:'新的节点A',
+							iconCls:"icon-update",
+							checked:true
+					}]
+			}];
+			$('#tt').tree('loadData',data);
+		}
+		
+		
+		
+		
+	</script>
+
+</body>
+</html>
