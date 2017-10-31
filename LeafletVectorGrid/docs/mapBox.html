@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <meta charset='utf-8' />
+    <!--author siptea.cn-->
+    <title>上海楼栋分布</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <meta name="Keywords" content="上海楼栋分布、地理数据可视化">
+<meta name="Description" content="北京在线云图科技有限公司是一家专注于地理信息软件服务的公司，拥有全球领先的地图应用技术。其产品以功能强大、行业通用的在线接口著称，可以快速定制出企业需要的地图应用软件。广泛应用于各行各业，如网点标注、无缝隙无重叠的区域划分、订单分拣、订单自动分区、空间信息智能统计分析等">
+    <meta name="Description" content="">
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .mapboxgl-ctrl-bottom-left {
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="mapbox/mapbox-gl.css">
+    <script src="mapbox/mapbox-gl.js"></script>
+</head>
+<body>
+<div id="map" style="width: 100%; height: 100%"></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoienVvMTE4OCIsImEiOiJEaE5TeXJZIn0.xSPvN9vzgYyEiCjsspGN2g';
+    var simple = {
+        "version": 8,
+        "sources": {
+            "amap":{
+                "type":"raster",
+                "tileSize":256,
+                "minzoom":3,
+                "maxzoom":18,
+                "tiles":[location.protocol+"//webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+                    location.protocol+"//webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+                    location.protocol+"//webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+                    location.protocol+"//webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"]
+            }
+        },
+        "layers": [
+            {
+                "id": "background",
+                "type": "background",
+                "paint": {
+                    "background-color": "rgb(4,7,14)"
+                }
+            },
+            {
+                "id": "amap",
+                "type": "raster",
+                "source": "amap",
+                "source-layer": "amap"
+            }
+        ]
+    };
+
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style:simple,
+        pitch:80,
+        minZoom:12,
+        renderWorldCopies:false,
+        attributionControl:false,
+        zoom: 16,
+        center: [121.449333,31.20907]
+    });
+    map.addControl(new mapboxgl.NavigationControl());
+    function getRandomColor() {
+        //声明一个16进制所需字符的字符串
+        var str = "0123456789abcdef";
+        //十六进制颜色头
+        var t = "#";
+        for (j = 0; j < 6; j++) {
+            //　charAt(index)方法返回一个位于提供给它的参数引索处的字符.0--length-1,如果为非整数则向下取整
+            t = t + str.charAt(Math.random() * str.length);
+
+        }
+        return t;
+    }
+    map.on('load',function () {
+        map.addSource('county',{
+            "type": "vector",
+            //"minzoom":12,
+            "minzoom":12,
+            "maxzoom":22,
+            "tiles": ["https://data.dituwuyou.com/tileVector/getTile?eId=2048&dataSetId=shanghai_building&where=&select=grade_leve,sett_type&x={x}&y={y}&z={z}"]
+            //"tiles": ["http://localhost:3000/share/china-latest.osm.pbf"]
+        });
+        var stops=[];
+        stops.push(['3011',getRandomColor()]);
+        stops.push(['3401',getRandomColor()]);
+        stops.push(['3100',getRandomColor()]);
+        stops.push(['3102',getRandomColor()]);
+        stops.push(['3014',getRandomColor()]);
+        stops.push(['3017',getRandomColor()]);
+        stops.push(['3000',getRandomColor()]);
+        stops.push(['3016',getRandomColor()]);
+        stops.push(['3101',getRandomColor()]);
+        stops.push(['3013',getRandomColor()]);
+        stops.push(['3010',getRandomColor()]);
+        stops.push(['3201',getRandomColor()]);
+        stops.push(['3015',getRandomColor()]);
+        stops.push(['3012',getRandomColor()]);
+
+        map.addLayer({
+            "id": "county",
+            "type": "fill-extrusion",
+            "source": "county",
+            "source-layer": "shanghai_building",
+            "paint": {
+                "fill-extrusion-color": {
+                    type:'categorical',
+                    property:'sett_type',
+                    stops:stops
+                },
+                "fill-extrusion-opacity": 1
+                ,"fill-extrusion-height":{
+                    "base":1,
+                    "type":"exponential",
+                    "property":"grade_leve",
+                    "stops":[[0,0],[10000,30000]]}
+            }
+        });
+    });
+    map.on('click', function (e) {
+        if (!map.loaded()){
+            return;
+        }
+        var features = map.queryRenderedFeatures(e.point, {layers: ['county']});
+        console.info(features[0]);
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!doctype html>
+<html>
+<head>
+　　<title>文件上传</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0,user-scalable=no">
+</head>
+<script type="text/javascript" src="dist/pbf.mini.js" ></script>
+<script type="text/javascript" src="dist/LayerApi.js" ></script>
+
+
+<body>
+    <section>
+        <canvas id="myCanvas" ></canvas>
+    </section>
+     
+     
+     <script>
+     	(function(){
+	     	var ctx = null;
+			function render(context, xyPoints,canvasFeature) {
+			    ctx = context;
+			    if( canvasFeature.type === 'Point' ) {
+			        renderPoint(xyPoints, this.size);
+			    } else if( canvasFeature.type === 'LineString' ) {
+			        renderLine(xyPoints);
+			    } else if( canvasFeature.type === 'Polygon' ) {
+			        renderPolygon(xyPoints);
+			    } else if( canvasFeature.type === 'MultiPolygon' ) {
+			        xyPoints.forEach(renderPolygon);
+			    }
+			}
+			function renderPoint(xyPoint, size) {
+			    ctx.beginPath();
+			
+			    ctx.arc(xyPoint.x, xyPoint.y, size, 0, 2 * Math.PI, false);
+			    ctx.fillStyle =  'rgba(0, 0, 0, .3)';
+			    ctx.lineWidth = 2;
+			    ctx.strokeStyle = 'green';
+			
+			    ctx.stroke();
+			    ctx.fill();
+			}
+			function renderLine(xyPoints) {
+			    ctx.beginPath();
+			    ctx.strokeStyle = 'orange';
+			    ctx.fillStyle = 'rgba(0, 0, 0, .3)';
+			    ctx.lineWidth = 2;
+			    var j;
+			    ctx.moveTo(xyPoints[0].x, xyPoints[0].y);
+			    for( j = 1; j < xyPoints.length; j++ ) {
+			        ctx.lineTo(xyPoints[j].x, xyPoints[j].y);
+			    }
+			
+			    ctx.stroke();
+			    ctx.fill();
+			}
+			
+			function renderPolygon(xyPoints) {
+				ctx.border = 1;
+			    ctx.beginPath();
+			    ctx.strokeStyle = '#000';
+			    ctx.fillStyle = 'rgba(255, 152, 0,.8)';
+			    ctx.lineWidth = 2;
+			
+			    var j;
+			    ctx.moveTo(xyPoints[0].x, xyPoints[0].y);
+			    for( j = 1; j < xyPoints.length; j++ ) {
+			        ctx.lineTo(xyPoints[j].x, xyPoints[j].y);
+			    }
+			    ctx.lineTo(xyPoints[0].x, xyPoints[0].y);
+			
+			    ctx.stroke();
+			    ctx.fill();
+			}
+			
+			window["renderMap"] = render;
+     	})();
+     </script>
+     
+     
+     
+     <script>
+ 	(function(){
+ 		
+ 		function readLocalFile () {
+        //alert("start...");
+        var localFile = document.getElementById("uploadFile").files[0];
+        
+        
+        
+        console.log(localFile);
+        var reader = new FileReader();
+        var file= new Promise(function(resolve){
+			reader.addEventListener("loadend", function() {
+	            console.log(reader,reader.result);
+				var pbf = new Pbf(reader.result);
+				console.log(pbf);
+			});
+			reader.readAsDataURL(localFile);  
+		}); 
+    }
+   
+    var initFile = function(){
+	    	var myCanvas = document.getElementById("myCanvas");
+	  		var ctx  = myCanvas.getContext("2d");
+	  		myCanvas.width = 256;
+	  		myCanvas.height = 256;
+	    	var url = "https://free-2.tilehosting.com/data/v3/12/3429/1665.pbf.pict?key=UmmATPUongHdDmIicgs7";
+//	    	var url = "https://tile.mapzen.com/mapzen/vector/v1/all/16/34531/23058.mvt?api_key=mapzen-cfbEgD9";
+	
+			var ajax = fetch(url).then(function(response){
+				if (!response.ok) {
+					return {layers:[]};
+				}
+	            console.log(response);
+				return response.blob().then( function (blob) {
+	   				console.info(blob);
+					var reader = new FileReader();
+					return new Promise(function(resolve){
+						reader.addEventListener("loadend", function() {
+							// reader.result contains the contents of blob as a typed array
+							// blob.type === 'application/x-protobuf'
+							var pbf = new Pbf( reader.result );
+							var tile = new VectorTile(pbf);
+							console.warn(pbf,tile);
+							
+							return resolve(tile);
+						});
+						reader.readAsArrayBuffer(blob);
+					});
+				});
+			}).then(function(json){
+	          
+	            console.log('Vector tile:', json.layers);
+	 			console.log('Vector tile water:', json.layers.water);	// Instance of VectorTileLayer
+	
+				// Normalize feature getters into actual instanced features
+				for (var layerName in json.layers) {
+					var feats = [];
+	
+					for (var i=0; i<json.layers[layerName].length; i++) {
+						var feat = json.layers[layerName].feature(i);
+						feat.geometry = feat.loadGeometry();
+						feats.push(feat);
+					}
+	
+					json.layers[layerName].features = feats;
+				}
+	          
+	            for (var key in json.layers) {
+	            	 var layer = json.layers[key];
+	            	 console.log(layer);
+	            	 var features = layer.features
+	            	 for (var featureName in features) {
+	            	      var feat = features[featureName];
+	            	      var converLayer = createLayer(feat,0.0625);
+	            	      
+	            	      drawCanvas(ctx,converLayer); //画图
+	            	 }
+	            }
+				return json;
+			});
+	    }
+   
+   
+   
+   
+      var  createLayer  =function(feat,pxPerExtent){
+      	   if(!feat){ return null;}
+      	   var type = feat.type;
+      	   var layer  = null;
+      	   if(type ==1){
+      	   	  layer=new PointLayer(feat,pxPerExtent);
+      	   }
+      	   if(type ==2){
+      	   	  layer =new PolylineLayer(feat,pxPerExtent);
+      	   }
+      	   if(type == 3){
+      	   	  layer = new PolygonLayer(feat,pxPerExtent);
+      	   }
+      	   return layer;
+      }
+      
+      
+      var polygonOption  = {
+	     stroke:true,
+	     color:"#2b2b2b",
+	     weight:1,
+	     opacity:0.4,
+	     lineCap:"round",
+	     lineJoin:"round",
+	     dashArray:null,
+	     dashOffset:null,
+	     fill:true,
+	     fillColor:"#2b2b2b",
+	     fillOpacity:0.2,
+	     fillRule:"evenodd",
+	     interactive:true,
+	     pane:"overlayPane",
+	     nonBubblingEvents:[],
+	     attribution:null
+      } ;
+ 	 var lineOpt={
+		stroke:true,
+		color:"#f2b648",
+		weight:1,
+		opacity:1,
+		lineCap:"round",
+		lineJoin:"round",
+		dashArray:null,
+		dashOffset:null,
+		fill:false,
+		fillColor:"#f2b648",
+		fillOpacity:0.2,
+		fillRule:"evenodd",
+		interactive:true,
+		pane:"overlayPane",
+		nonBubblingEvents:[],
+		attribution:null
+	};
+	
+	
+ 	
+ 	
+ 	  var PointLayer = function(feature,pxPerExtent){
+      	  this.init.apply(this,arguments);
+      }
+      PointLayer.prototype = {
+      	 init:function(feature,pxPerExtent){
+      	 	 this.feature = feature || {};
+      	 	 this.type = "point";
+      	  	 this.properties = feature["properties"];
+      	  	 this.options = feature["options"] || lineOpt;
+      	  	 this.geometry = feature.geometry;
+      	  }
+      };
+      
+      var PolylineLayer = function(feature,pxPerExtent){
+      	  this.init.apply(this,arguments);
+      }
+      PolylineLayer.prototype = {
+      	  init:function(feature,pxPerExtent){
+      	  	 this.feature = feature || {};
+      	  	 this.type = "ployline";
+      	  	 this.properties = feature["properties"];
+      	  	 this.options    = feature["options"] || lineOpt;
+      	  	 this.geometry   = feature.geometry;
+      	  	 this.parts = makeFeatureParts(feature,pxPerExtent);
+      	  }
+      };
+      var  PolygonLayer= function(feature,pxPerExtent){
+      	  this.init.apply(this,arguments);
+      }
+      PolygonLayer.prototype = {
+      	  init:function(feature,pxPerExtent){
+      	  	 this.feature = feature || {};
+      	  	 this.type = "ploygon";
+      	  	 this.prototypes = feature["properties"];
+      	  	 this.options = feature["options"] || polygonOption;
+      	  	 this.geometry = feature.geometry;
+      	  	 this.parts = makeFeatureParts(feature,pxPerExtent);
+      	  }
+      };
+    
+      makeFeatureParts = function(feature,pxPerExtent){
+			 var geometry = feature["geometry"];
+			 var part = [];
+    	     if(geometry && geometry.length > 0){
+    	     	for (var i = 0; i < geometry.length; i++ ) {
+    	     		 var pointList =  geometry[i];
+    	     		 var pointConver = [];
+    	     		 if(pointList && pointList.length >0){
+    	     		 	for (var j = 0; j < pointList.length; j++ ) {
+    	     		 		var point = pointList[j];
+    	     		 		 if("x" in point){
+	        	     		 	pointConver.push({
+	        	     		 		x:point["x"] * pxPerExtent,y:point["y"] * pxPerExtent
+	        	     		 	});
+	        	     		 }else{
+	        	     		 	pointConver.push({
+	        	     		 		x:point[0] * pxPerExtent,
+	        	     		 		y:point[1] * pxPerExtent
+	        	     		 	});
+	        	     		 }
+    	     		 	}
+    	     		 }
+    	     		 part.push(pointConver);
+    	     	}
+    	     }
+    	    return part;
+      }
+      
+      var fillStroke =  function (ctx, layer) {
+		var options = layer.options;
+
+		if (options.fill) {
+			ctx.globalAlpha = options.fillOpacity;
+			ctx.fillStyle = options.fillColor || options.color;
+			ctx.fill(options.fillRule || 'evenodd');
+		}
+
+		if (options.stroke && options.weight !== 0) {
+			ctx.globalAlpha = options.opacity;
+			ctx.lineWidth = options.weight;
+			ctx.strokeStyle = options.color;
+			ctx.lineCap = options.lineCap;
+			ctx.lineJoin = options.lineJoin;
+			ctx.stroke();
+		}
+	}
+      
+      var drawCanvas = function(ctx,layer){
+      	   console.log(ctx,layer);
+      	   if(!layer.parts){
+      	   	  return ;
+      	   }
+      	   var closed = layer.type =="ployline" ? false : layer.type =="ploygon" ? true : false;
+      	   var parts = layer.parts,len = parts.length;
+      	   ctx.beginPath();
+      	   for (var i = 0; i < len; i++) {
+      	   	    var partTwo = parts[i];
+				for (var j = 0; j < partTwo.length; j++) {
+					var point = partTwo[j];
+					var PX = point["x"],PY = point["y"];
+					ctx[j ? 'lineTo' : 'moveTo'](PX,PY);
+				}
+				if (closed) {
+					ctx.closePath();
+				}
+		  }
+      	  fillStroke(ctx, layer);
+      }
+      
+	   
+	    initFile();
+ 	})();
+ 	
+ 
+ 	
+   
+ </script>
+     
+     
+     <script>
+	  var c1 = document.getElementById("myCanvas");
+	  var ctx  = c1.getContext("2d");
+	  ctx.width = 256;
+	  ctx.height = 256;
+	  var canvasFeature = {
+	  	type: "Polygon"
+	  }
+	  var xyList  =[
+	    {x:10,y:10},
+	    {x:40,y:40},
+	    {x:80,y:60},
+	    {x:40,y:20}
+	  ];
+	 // renderMap(ctx,xyList,canvasFeature);
+	
+	
+	</script>
+</body>
+</html>

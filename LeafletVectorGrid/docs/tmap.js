@@ -1,0 +1,1 @@
+https://cdn.jsdelivr.net/npm/maptalks@0.33.1/dist/maptalks.min.js
