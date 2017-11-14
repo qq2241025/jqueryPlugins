@@ -27,7 +27,7 @@ html, body {
 <div id="map"></div>
 
 <script>
-var map = new L.Map('map').setView([25.030659102852,121.57696510846], 17); // Barcelona
+var map = new L.Map('map').setView([24.980208083595,121.58703111703], 17); // Barcelona
 new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 19, maxZoom: 21 }).addTo(map);
 
 $.get('geojsons/4342.json', function(geojson){
