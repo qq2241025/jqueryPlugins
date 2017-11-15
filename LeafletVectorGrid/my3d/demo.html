@@ -27,8 +27,8 @@ html, body {
 <div id="map"></div>
 
 <script>
-var map = new L.Map('map').setView([24.980208083595,121.58703111703], 19); // Barcelona
-new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 19, maxZoom: 21 }).addTo(map);
+var map = new L.Map('map').setView([24.980208083595,121.58703111703], 20); // Barcelona
+new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 21, maxZoom: 21 }).addTo(map);
 var omsData = builderData;
     var osmb = new OSMBuildings(map).set(omsData);
 </script>

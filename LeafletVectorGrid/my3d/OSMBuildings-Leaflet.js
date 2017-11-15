@@ -553,7 +553,7 @@ var GeoJSON = (function() {
           res.push(item); // TODO: clone base properties!
         }
       }
-
+      console.log("GeoJSON.read()",res);
       return res;
     }
   };
@@ -902,6 +902,7 @@ var Data = {
   },
 
   addRenderItems: function(data, allAreNew) {
+  	console.log("data-addRenderItems",data, allAreNew);
     var item, scaledItem, id;
     var geojson = GeoJSON.read(data);
     for (var i = 0, il = geojson.length; i < il; i++) {
@@ -1338,7 +1339,7 @@ var Buildings = {
     console.info(dataItems);
     for (var i = 0, il = dataItems.length; i < il; i++) {
       item = dataItems[i];
-
+    
       if (Simplified.isSimple(item)) {
         continue;
       }
@@ -1705,11 +1706,12 @@ var Debug = {
 var animTimer;
 
 function fadeIn() {
+  console.log("fadeIn");
   if (animTimer) {
     return;
   }
 
-  animTimer = setInterval(function() {
+  animTimer = setTimeout(function() {
     var dataItems = Data.items,
       isNeeded = false;
 
@@ -1722,7 +1724,7 @@ function fadeIn() {
         isNeeded = true;
       }
     }
-
+    console.log("Layers.render()");
     Layers.render();
 
     if (!isNeeded) {

@@ -2022,11 +2022,11 @@ var Layers = {
 
   render: function(quick) {
     requestAnimFrame(function() {
-      if (!quick) {
-        Shadows.render();
-        Simplified.render();
-        HitAreas.render();
-      }
+//    if (!quick) {
+//      Shadows.render();
+//      Simplified.render();
+//      HitAreas.render();
+//    }
       Buildings.render();
     });
   },
