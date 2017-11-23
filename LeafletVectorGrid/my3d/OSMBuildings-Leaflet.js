@@ -5,8 +5,7 @@
  */
 //****** file: prefix.js ******
 
-(function(global) {
-
+var global = window;
   'use strict';
 
 
@@ -553,7 +552,7 @@ var GeoJSON = (function() {
           res.push(item); // TODO: clone base properties!
         }
       }
-      console.log("GeoJSON.read()",res);
+
       return res;
     }
   };
@@ -902,7 +901,6 @@ var Data = {
   },
 
   addRenderItems: function(data, allAreNew) {
-  	console.log("data-addRenderItems",data, allAreNew);
     var item, scaledItem, id;
     var geojson = GeoJSON.read(data);
     for (var i = 0, il = geojson.length; i < il; i++) {
@@ -1059,39 +1057,27 @@ var Data = {
 var Block = {
 
   draw: function(context, polygon, innerPolygons, height, minHeight, color, altColor, roofColor) {
-    var
-      i, il,
-      roof = this._extrude(context, polygon, height, minHeight, color, altColor),
-      innerRoofs = [];
+    var  i, il, roof = this._extrude(context, polygon, height, minHeight, color, altColor),innerRoofs = [];
+    console.log("context-->",context, "polygon-->",polygon,"roof-->" ,roof, "innerPolygons-->",innerPolygons, "height-->",height, "minHeight-->",minHeight, "color-->",color, "altColor-->",altColor,"roofColor-->", roofColor);
 
-    if (innerPolygons) {
-      for (i = 0, il = innerPolygons.length; i < il; i++) {
-        innerRoofs[i] = this._extrude(context, innerPolygons[i], height, minHeight, color, altColor);
-      }
-    }
-
+   
     context.fillStyle = roofColor;
 
     context.beginPath();
     this._ring(context, roof);
-    if (innerPolygons) {
-      for (i = 0, il = innerRoofs.length; i < il; i++) {
-        this._ring(context, innerRoofs[i]);
-      }
-    }
     context.closePath();
     context.stroke();
     context.fill();
   },
 
   _extrude: function(context, polygon, height, minHeight, color, altColor) {
-    var
-      scale = CAM_Z / (CAM_Z-height),
-      minScale = CAM_Z / (CAM_Z-minHeight),
+    var scale = CAM_Z / (CAM_Z-height),  minScale = CAM_Z / (CAM_Z-minHeight),
       a = { x:0, y:0 },
       b = { x:0, y:0 },
       _a, _b,
       roof = [];
+      
+      console.log(CAM_Z,scale,"ORIGIN_X-->",ORIGIN_X,"ORIGIN_X-->",ORIGIN_Y);
 
     for (var i = 0, il = polygon.length-3; i < il; i += 2) {
       a.x = polygon[i  ]-ORIGIN_X;
@@ -1102,10 +1088,6 @@ var Block = {
       _a = Buildings.project(a, scale);
       _b = Buildings.project(b, scale);
 
-      if (minHeight) {
-        a = Buildings.project(a, minScale);
-        b = Buildings.project(b, minScale);
-      }
 
       // backface culling check
       if ((b.x-a.x) * (_a.y-a.y) > (_a.x-a.x) * (b.y-a.y)) {
@@ -1237,9 +1219,7 @@ var Cylinder = {
   },
 
     // http://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Tangents_between_two_circles
-  _tangents: function(c1, r1, c2, r2) {
-  	return null;
-  }
+  _tangents: function(c1, r1, c2, r2) {}
 };
 
 
@@ -1333,22 +1313,12 @@ var Buildings = {
       wallColor, altColor, roofColor,
       dataItems = Data.items;
 
-    dataItems.sort(function(a, b) {
-      return (a.minHeight-b.minHeight) || getDistance(b.center, sortCam) - getDistance(a.center, sortCam) || (b.height-a.height);
-    });
-    console.info(dataItems);
+
     for (var i = 0, il = dataItems.length; i < il; i++) {
       item = dataItems[i];
-    
-      if (Simplified.isSimple(item)) {
-        continue;
-      }
 
       footprint = item.footprint;
 
-      if (!isVisible(footprint)) {
-        continue;
-      }
 
       // when fading in, use a dynamic height
       h = item.scale < 1 ? item.height*item.scale : item.height;
@@ -1362,14 +1332,18 @@ var Buildings = {
       altColor  = item.altColor  || ALT_COLOR_STR;
       roofColor = item.roofColor || ROOF_COLOR_STR;
       context.strokeStyle = altColor;
-      console.log("item.shape", item.shape)
+      
+      
+
       switch (item.shape) {
         case 'cylinder': Cylinder.draw(context, item.center, item.radius, item.radius, h, mh, wallColor, altColor, roofColor); break;
         case 'cone':     Cylinder.draw(context, item.center, item.radius, 0, h, mh, wallColor, altColor);                      break;
         case 'dome':     Cylinder.draw(context, item.center, item.radius, item.radius/2, h, mh, wallColor, altColor);          break;
         case 'sphere':   Cylinder.draw(context, item.center, item.radius, item.radius, h, mh, wallColor, altColor, roofColor); break;
         case 'pyramid':  Pyramid.draw(context, footprint, item.center, h, mh, wallColor, altColor);                            break;
-        default:         Block.draw(context, footprint, item.holes, h, mh, wallColor, altColor, roofColor);
+        default:          
+        	console.log("Block.draw");
+        	Block.draw(context, footprint, item.holes, h, mh, wallColor, altColor, roofColor);
       }
 
       switch (item.roofShape) {
@@ -1706,32 +1680,30 @@ var Debug = {
 var animTimer;
 
 function fadeIn() {
-  console.log("fadeIn");
   if (animTimer) {
     return;
   }
 
-  animTimer = setTimeout(function() {
-    var dataItems = Data.items,
-      isNeeded = false;
-
-    for (var i = 0, il = dataItems.length; i < il; i++) {
-      if (dataItems[i].scale < 1) {
-        dataItems[i].scale += 0.5*0.2; // amount*easing
-        if (dataItems[i].scale > 1) {
-          dataItems[i].scale = 1;
-        }
-        isNeeded = true;
-      }
-    }
-    console.log("Layers.render()");
-    Layers.render();
-
-    if (!isNeeded) {
-      clearInterval(animTimer);
-      animTimer = null;
-    }
-  }, 33);
+//	animTimer = setInterval(function() {
+	    var dataItems = Data.items,
+	      isNeeded = false;
+	
+	    for (var i = 0, il = dataItems.length; i < il; i++) {
+	      if (dataItems[i].scale < 1) {
+	        dataItems[i].scale += 0.2; // amount*easing
+	        if (dataItems[i].scale > 1) {
+	          dataItems[i].scale = 1;
+	        }
+	        isNeeded = true;
+	      }
+	    }
+	    Layers.render();
+	
+	    if (!isNeeded) {
+	      clearInterval(animTimer);
+	      animTimer = null;
+	    }
+//	}, 33);
 }
 
 var Layers = {
@@ -1760,6 +1732,7 @@ var Layers = {
 //      Simplified.render();
 //      HitAreas.render();
 //    }
+      console.log("Buildings.render");
       Buildings.render();
     });
   },
@@ -2100,6 +2073,5 @@ osmb.ATTRIBUTION = ATTRIBUTION;
 
   global.OSMBuildings = osmb;
 
-}(this));
 
 

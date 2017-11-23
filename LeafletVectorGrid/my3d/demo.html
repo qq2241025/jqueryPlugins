@@ -17,20 +17,107 @@ html, body {
 }
 </style>
 <link rel="stylesheet" type="text/css" href="0.73/leaflet.css"/>
-<script src="0.73/leaflet.js"></script>
-<script src="OSMBuildings-Leaflet.js"></script>
-<script src="data.js"></script>
+<script src="0.73/leaflet-src.js"></script>
+	<script src="OSMBuildings-Leaflet.js"></script>
 
+<script src="data.js"></script>
+<script src="geoUtils.js"></script>
+<script src="ajax-browser-min.js"></script>
 </head>
 
 <body>
 <div id="map"></div>
-
 <script>
-var map = new L.Map('map').setView([24.980208083595,121.58703111703], 20); // Barcelona
-new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 21, maxZoom: 21 }).addTo(map);
-var omsData = builderData;
-    var osmb = new OSMBuildings(map).set(omsData);
+var center ={lat:24.980314689294,lng:121.58699723446},zoom = 17,mapDom = document.getElementById("map");
+var mapSize = [mapDom.offsetWidth,mapDom.offsetHeight];
+//var mapObj = new L.Map('map').setView(center, zoom); // Barcelona
+
+var mapObj = new AMap.Map('map',{
+	 zoom : zoom,
+	 center : new AMap.LngLat(center["lng"],center["lat"])
+})
+
+//new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 12, maxZoom: 21 }).addTo(mapObj);
+//var omsData = builderData;
+//var osmb = new OSMBuildings(mapObj).set(omsData);
+
+
+
+//
+var lnglats =builderData.features[0].geometry.coordinates[0];
+console.log(lnglats);
+//
+//
+var center = mapObj.getCenter();
+
+
+
+var geoUtil = new geoMap({
+	 zoom  : zoom,
+	 center: center,
+	 mapSize: mapSize
+});
+
+//
+//var lnglat2pix = geoUtil.lnglat2Pixel(xt,zoom);
+//console.log(xt,"--->",lnglat2pix);
+//
+//
+//var  pixXT2lnglat = geoUtil.pixel2lnglat(lnglat2pix,zoom);
+//console.log(lnglat2pix,"--->",pixXT2lnglat);
+//
+//console.log("*********pixContainer*********************");
+//
+//var lnglat2pixQ = geoUtil.lngLatToContainer(xt,zoom);
+//console.log(xt,"--->",lnglat2pixQ);
+//
+//
+//var  pixXT2lnglatQ = geoUtil.containerXYTolngLat(lnglat2pixQ,zoom);
+//console.log(lnglat2pixQ,"--->",pixXT2lnglatQ);
+
+
+
+//
+//console.log("*********Amap*********************");
+//var cpoint = mapObj.latLngToContainerPoint(xt,zoom);
+//console.log(cpoint);
+//
+//var xpoint = mapObj.containerPointToLatLng(cpoint);
+//console.log(xt,xpoint);
+
+
+
+
+
+
+//
+//
+////console.info(initOraninx);
+//
+//console.info(xt);
+var list = [],listMector= [];
+for (var i = 0 ;i <lnglats.length;i++) {
+	var arr = lnglats[i];
+	var lnglat= {
+		 lat : arr[1],
+		 lng : arr[0]
+	};
+	var pix  = mapObj.lnglatToPixel(lnglat,zoom); //mapObj.lnglatToContainer   // mapObj.latLngToContainerPoint
+	list.push(pix["x"],pix["y"]);
+	var pixMer = geoUtil.lnglat2Pixel(lnglat,zoom);
+	listMector.push(pixMer["x"],pixMer["y"]);
+}
+console.log(list);
+console.log(listMector);
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>

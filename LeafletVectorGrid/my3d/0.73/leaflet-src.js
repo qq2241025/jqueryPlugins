@@ -1924,6 +1924,7 @@ L.Map = L.Class.extend({
 
 	getPixelOrigin: function () {
 		this._checkIfLoaded();
+		var lnglat = this._initialTopLeftPoint;
 		return this._initialTopLeftPoint;
 	},
 
@@ -1952,7 +1953,9 @@ L.Map = L.Class.extend({
 
 	project: function (latlng, zoom) { // (LatLng[, Number]) -> Point
 		zoom = zoom === undefined ? this._zoom : zoom;
-		return this.options.crs.latLngToPoint(L.latLng(latlng), zoom);
+		
+		var point = this.options.crs.latLngToPoint(L.latLng(latlng), zoom)
+		return point;
 	},
 
 	unproject: function (point, zoom) { // (Point[, Number]) -> LatLng
@@ -1965,9 +1968,11 @@ L.Map = L.Class.extend({
 		return this.unproject(projectedPoint);
 	},
 
-	latLngToLayerPoint: function (latlng) { // (LatLng)
-		var projectedPoint = this.project(L.latLng(latlng))._round();
-		return projectedPoint._subtract(this.getPixelOrigin());
+	latLngToLayerPoint: function (latlng) { // (LatLng)\n
+		var point = L.latLng(latlng);
+		var projectedPoint = this.project(point)._round();
+		var xt = projectedPoint._subtract(this.getPixelOrigin());
+		return xt;
 	},
 
 	containerPointToLayerPoint: function (point) { // (Point)
@@ -2090,9 +2095,9 @@ L.Map = L.Class.extend({
 
 		this._zoom = zoom;
 		this._initialCenter = center;
-
+        
 		this._initialTopLeftPoint = this._getNewTopLeftPoint(center);
-
+         
 		if (!preserveMapOffset) {
 			L.DomUtil.setPosition(this._mapPane, new L.Point(0, 0));
 		} else {
@@ -2275,7 +2280,9 @@ L.Map = L.Class.extend({
 	_getNewTopLeftPoint: function (center, zoom) {
 		var viewHalf = this.getSize()._divideBy(2);
 		// TODO round on display, not calculation to increase precision?
-		return this.project(center, zoom)._subtract(viewHalf)._round();
+		var pj = this.project(center, zoom);
+		var xys = pj._subtract(viewHalf)._round();
+		return xys;
 	},
 
 	_latLngToNewLayerPoint: function (latlng, newZoom, newCenter) {

@@ -1,69 +1,92 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-　　<title>文件上传</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0,user-scalable=no">
-</head>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="data.js"></script>
+		<script src="GEOJSON.js"></script>
+		<script src="DataUtils.js"></script>
+		<script src="../demo/3d/JS/jquery-1.10.2.min.js"></script>
+	</head>
+	<body style="transform: translate3d(0px, 0px, 0px); image-rendering: optimizespeed; position: absolute; left: 0px; top: 0px;margin: 0px;padding:0px;">
+	<canvas id="myCanvas" ></canvas>
 
-
-<body>
-<section>
-    <canvas id="myCanvas" ></canvas>
-</section>
-<script src="GEOJSON.js"></script>
-<script src="DataUtils.js"></script>
-<script src="data.js"></script>
      
- <script>
-(function(){
-	
-	var data = GeoJSON.read(builderData);
-	var ll = GeoJSON.geoToPixel(12,12);
-	console.log(ll);
-	var aaa = GeoJSON.pixelToGeo(12,12);
-	console.log(aaa);
+	 <script>
+	(function(){
+		
+		
 
-
- var utils = {
-	string2UnicodeCode: function(str) {
-		var surrogate1st = 0,
-			unicodeCodes = [],
-			i = 0,
-			l = str.length;
-
-		for (; i < l; i++) {
-			var utf16Code = str.charCodeAt(i);
-			if (surrogate1st != 0) {
-				if (utf16Code >= 0xDC00 && utf16Code <= 0xDFFF) {
-					var surrogate2nd = utf16Code,
-						unicodeCode = (surrogate1st - 0xD800) * (1 << 10) + (1 << 16) + (surrogate2nd - 0xDC00);
-					unicodeCodes.push(unicodeCode);
-				}
-				surrogate1st = 0;
-			} else if (utf16Code >= 0xD800 && utf16Code <= 0xDBFF) {
-				surrogate1st = utf16Code;
-			} else {
-				unicodeCodes.push(utf16Code);
+	var IS_IOS = /iP(ad|hone|od)/g.test(navigator.userAgent);
+	var IS_MSIE = !!~navigator.userAgent.indexOf('Trident');
+	var requestAnimFrame = (window.requestAnimationFrame && !IS_IOS && !IS_MSIE) ?window.requestAnimationFrame : function(callback) {callback();};
+			
+		  var data = GeoJSON.read(builderData);
+		  var ll = GeoJSON.geoToPixel(12,12);
+		  console.log(ll);
+		  var aaa = GeoJSON.pixelToGeo(12,12);
+		  console.log(aaa);
+	  
+	      var WIDTH = 3600,HEIGHT= 1860;
+	   	  
+		  var myCanvas = document.getElementById("myCanvas");
+		  var context = myCanvas.getContext("2d");
+		  myCanvas.style.width  = WIDTH + "px";
+		  myCanvas.style.height = HEIGHT+ "px";
+		  myCanvas.style.border ="1px solid #000";
+		  
+		  context.clearRect(0, 0, WIDTH, HEIGHT);
+		  
+		  var path = [798,235,727,220,744,102,822,118,806,236];
+		  var path = [774,208,752,203,730,198,729,198,745,82,822,98,807, 215, 800, 213]
+		  
+		  function renderPolygon(polygon) {
+		  	console.log(polygon);
+		    context.fillStyle = 'rgba(51, 0, 204, 0.77)';
+		    context.beginPath();
+		    _ring(context,polygon);
+		    context.closePath();
+    		context.stroke();
+    		context.fill();
+		}
+		  
+		_ring =  function(context, polygon) {
+		    context.moveTo(polygon[0], polygon[1]);
+		    for (var i = 2, il = polygon.length-1; i < il; i += 2) {
+		      context.lineTo(polygon[i], polygon[i+1]);
+		    }
+		}
+		
+		var dataFormat = function(){
+			var arr= [];
+			for(var i = 0 ; i <path.length;i++){
+				var pa =  path[i] * 0.5;
+				arr.push(pa);
 			}
+			return arr;
 		}
-		return unicodeCodes;
-	},
-	_escapeToUtf32: function(str) {
-		var escaped = [], unicodeCodes = this.string2UnicodeCode(str), i = 0, l = unicodeCodes.length, hex;
-		for (var i = 0; i < l; i++) {
-			hex = unicodeCodes[i].toString(16);
-			escaped.push('0000'.substr(hex.length) + hex);
-		}
-		return escaped.join('-');
-	}
-  };
-  var code = utils._escapeToUtf32("1234");
-  console.log(code);
-  
-	
-})();
-</script>
-</body>
+		
+		
+		var i = 0 ;
+		var timer = setInterval(function(){
+			if(i==5 && timer){
+				clearInterval(timer);
+				return ;
+			}
+			i++;
+			requestAnimFrame(function(){
+				var data = dataFormat(path);
+				renderPolygon(data);
+			});
+			
+		},33);
+		
+		
+		 
+		
+		
+		
+	})();
+	</script>
+	</body>
 </html>

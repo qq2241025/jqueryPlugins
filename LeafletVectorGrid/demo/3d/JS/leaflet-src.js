@@ -1960,6 +1960,7 @@ L.Map = L.Class.extend({
 
 	latLngToLayerPoint: function (latlng) { // (LatLng)
 		var projectedPoint = this.project(L.latLng(latlng))._round();
+		console.log(projectedPoint);
 		return projectedPoint._subtract(this.getPixelOrigin());
 	},
 
