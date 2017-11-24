@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <title>Polygon Objects</title>
+
+    <style>
+      body {
+         background: #eeeeee;
+      }
+
+      #controls {
+         position: absolute;
+         left: 25px;
+         top: 25px;
+      }
+      
+      #canvas {
+         background: #ffffff;
+         cursor: crosshair;
+         margin-left: 10px;
+         margin-top: 10px;
+         -webkit-box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+         -moz-box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+         box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+      }
+
+    </style>
+  </head>
+
+   <body>
+      <canvas id='canvas' width='850' height='600'>
+         Canvas not supported
+      </canvas>
+      <script>
+      	var c = document.getElementById("canvas");
+		var g = c.getContext("2d");
+		c.width = 1400;
+		c.height = 460;
+		
+//		g.rotate(1,1)
+		
+		function drawIsoCube(x, y, z, w, h, d) {
+		    //draw the top
+		    g.fillStyle = "#b0b0c8";
+		    var p1 = toIso(x, y, z);
+		    var p2 = toIso(x + w, y, z);
+		    var p3 = toIso(x, y + h, z);
+		    var p4 = toIso(x + w, y + h, z);
+		
+		
+		    var p5 = toIso(x, y, z + d);
+		    var p6 = toIso(x + w, y, z + d);
+		    var p7 = toIso(x, y + h, z + d);
+		    var p8 = toIso(x + w, y + h, z + d);
+		    
+		    console.log(p1,p2,p3,p4,p5,p6,p7,p8);
+		
+		    //第一个面
+		    g.beginPath();
+		    g.moveTo(p1.x, p1.y);
+		    g.lineTo(p2.x, p2.y);
+		    g.lineTo(p4.x, p4.y);
+		    g.lineTo(p3.x, p3.y);
+		    g.fill();
+		    g.fillStyle = "#a0a0a0";
+		
+		    g.beginPath();
+		    g.moveTo(p1.x, p1.y);
+		    g.lineTo(p2.x, p2.y);
+		    g.lineTo(p6.x, p6.y);
+		    g.lineTo(p5.x, p5.y);
+		    g.fill();
+		    g.fillStyle = "#9090a0";
+		
+//		    g.beginPath();
+//		    g.moveTo(p4.x, p4.y);
+//		    g.lineTo(p8.x, p8.y);
+//		    g.lineTo(p6.x, p6.y);
+//		    g.lineTo(p2.x, p2.y);
+//		    g.fill();
+		}
+		
+		
+		function toIso(x, y, z) {
+		    return {
+		        x: 2 * x + 2 * y,
+		        y: 1 * x - 1 * y + z
+		    };
+		}
+		
+		
+		function update() {
+            
+        requestAnimationFrame(function(){
+            	var h = 240; 
+            	drawIsoCube(225, 50, 120, 30, 40, 50);
+        });
+            
+		}
+		update();
+      </script>
+  </body>
+</html>

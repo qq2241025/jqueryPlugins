@@ -3,68 +3,100 @@
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
-		<script src="data.js"></script>
-		<script src="GEOJSON.js"></script>
-		<script src="DataUtils.js"></script>
-		<script src="../demo/3d/JS/jquery-1.10.2.min.js"></script>
 	</head>
-	<body style="transform: translate3d(0px, 0px, 0px); image-rendering: optimizespeed; position: absolute; left: 0px; top: 0px;margin: 0px;padding:0px;">
-	<canvas id="myCanvas" ></canvas>
-
-     
+	<body style="margin: 0px;padding:0px;">
+	<style>
+		html,body{width:100%;height: 100%;;}
+		#myCanvas{
+		    -ms-transform:translate3d(0px,0,0);
+		    -webkit-transform:translate3d(0px,0,0);
+		    -o-transform:translate3d(0px,0,0);
+		    -moz-transform:translate3d(0px,0,0);
+		    transform: translate3d(0px, 0px, 0px);
+		    position: absolute;
+		    left: 0px;
+		    top: 0px;
+		    border:1px solid #d3d3d3;
+		}
+		
+	</style>
+	<div id="div" style="transform: translate(0px, -55px);width: 100%;height: 100%;">
+		<canvas id="myCanvas"></canvas>
+	</div>
 	 <script>
 	(function(){
 		
 		
 
-	var IS_IOS = /iP(ad|hone|od)/g.test(navigator.userAgent);
-	var IS_MSIE = !!~navigator.userAgent.indexOf('Trident');
-	var requestAnimFrame = (window.requestAnimationFrame && !IS_IOS && !IS_MSIE) ?window.requestAnimationFrame : function(callback) {callback();};
-			
-		  var data = GeoJSON.read(builderData);
-		  var ll = GeoJSON.geoToPixel(12,12);
-		  console.log(ll);
-		  var aaa = GeoJSON.pixelToGeo(12,12);
-		  console.log(aaa);
-	  
-	      var WIDTH = 3600,HEIGHT= 1860;
+//	var IS_IOS = /iP(ad|hone|od)/g.test(navigator.userAgent);
+//	var IS_MSIE = !!~navigator.userAgent.indexOf('Trident');
+//	var requestAnimFrame = (window.requestAnimationFrame && !IS_IOS && !IS_MSIE) ?window.requestAnimationFrame : function(callback) {callback();};
+// 
+	      var WIDTH = 1600,HEIGHT= 450;
 	   	  
 		  var myCanvas = document.getElementById("myCanvas");
+		  myCanvas.width = WIDTH;
+		  myCanvas.height = HEIGHT;
 		  var context = myCanvas.getContext("2d");
-		  myCanvas.style.width  = WIDTH + "px";
-		  myCanvas.style.height = HEIGHT+ "px";
-		  myCanvas.style.border ="1px solid #000";
+		  context.lineCap   = 'round';
+    	  context.lineJoin  = 'round';
+    	  context.lineWidth = 1;
+          context.imageSmoothingEnabled = false;
 		  
-		  context.clearRect(0, 0, WIDTH, HEIGHT);
 		  
-		  var path = [798,235,727,220,744,102,822,118,806,236];
-		  var path = [774,208,752,203,730,198,729,198,745,82,822,98,807, 215, 800, 213]
+		  var list = [{ x: 550, y: 295 },
+					  { x: 610, y: 325 },
+					  { x: 630, y: 255 } ,
+					  { x: 690, y: 285 },
+					  { x: 550, y: 345 }, 
+					  { x: 610, y: 375 }, 
+					  { x: 630, y: 305 }, 
+					  { x: 690, y: 335 }];
 		  
-		  function renderPolygon(polygon) {
-		  	console.log(polygon);
-		    context.fillStyle = 'rgba(51, 0, 204, 0.77)';
-		    context.beginPath();
-		    _ring(context,polygon);
-		    context.closePath();
-    		context.stroke();
-    		context.fill();
+		  
+		  
+		  
+		  
+		  
+		function renderPolygon(context,polygon) {
+		  	
+		  	 
 		}
 		  
 		_ring =  function(context, polygon) {
 		    context.moveTo(polygon[0], polygon[1]);
 		    for (var i = 2, il = polygon.length-1; i < il; i += 2) {
-		      context.lineTo(polygon[i], polygon[i+1]);
+		        context.lineTo(polygon[i], polygon[i+1]);
 		    }
 		}
+		
+		var _extrude = function(context,lnglist){
+			for(var i= 0 ; i < lnglist.length ;i++){
+				var face = lnglist[i];
+				context.fillStyle = 'rgba(52, 1, 204, 0.89)';
+				context.beginPath();
+		        _ring(context, face);
+		        context.closePath();
+    			context.stroke();
+    			context.fill();
+			}
+			return  path;
+		}
+		
 		
 		var dataFormat = function(){
 			var arr= [];
 			for(var i = 0 ; i <path.length;i++){
-				var pa =  path[i] * 0.5;
+				var pa =  path[i] * 1;
 				arr.push(pa);
 			}
 			return arr;
 		}
+		
+		
+		
+		
+
 		
 		
 		var i = 0 ;
@@ -74,19 +106,38 @@
 				return ;
 			}
 			i++;
-			requestAnimFrame(function(){
-				var data = dataFormat(path);
-				renderPolygon(data);
-			});
+			requestAnimationFrame(function(){
+		 	var data = dataFormat(path);
+			renderPolygon(context,data);
+		 })
 			
-		},33);
+		},100);
 		
 		
 		 
-		
-		
+		 
+//		 var test= function(){
+//		 	
+//		    var data = [100, 100, 825, 316];
+//			context.fillStyle = 'rgba(51, 0, 204, 0.77)';
+//			context.beginPath();
+//		    _ring(context, data);
+//		    context.closePath();
+//		    context.fill();
+//		 }
+		 
+		 
+		 
+		 
+		 
+		 
+		 
 		
 	})();
 	</script>
 	</body>
 </html>
+
+
+
+

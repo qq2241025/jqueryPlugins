@@ -28,18 +28,18 @@ html, body {
 <body>
 <div id="map"></div>
 <script>
-var center ={lat:24.980314689294,lng:121.58699723446},zoom = 17,mapDom = document.getElementById("map");
+var center ={lat:24.980314689294,lng:121.58699723446},zoom = 20,mapDom = document.getElementById("map");
 var mapSize = [mapDom.offsetWidth,mapDom.offsetHeight];
-//var mapObj = new L.Map('map').setView(center, zoom); // Barcelona
+var mapObj = new L.Map('map').setView(center, zoom); // Barcelona
 
-var mapObj = new AMap.Map('map',{
-	 zoom : zoom,
-	 center : new AMap.LngLat(center["lng"],center["lat"])
-})
+//var mapObj = new AMap.Map('map',{
+//	 zoom : zoom,
+//	 center : new AMap.LngLat(center["lng"],center["lat"])
+//})
 
-//new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 12, maxZoom: 21 }).addTo(mapObj);
-//var omsData = builderData;
-//var osmb = new OSMBuildings(mapObj).set(omsData);
+new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 12, maxZoom: 21 }).addTo(mapObj);
+var omsData = builderData;
+var osmb = new OSMBuildings(mapObj).set(omsData);
 
 
 
@@ -102,7 +102,7 @@ for (var i = 0 ;i <lnglats.length;i++) {
 		 lat : arr[1],
 		 lng : arr[0]
 	};
-	var pix  = mapObj.lnglatToPixel(lnglat,zoom); //mapObj.lnglatToContainer   // mapObj.latLngToContainerPoint
+	var pix  = mapObj.latLngToLayerPoint(lnglat,zoom); //mapObj.lnglatToContainer   // mapObj.latLngToContainerPoint
 	list.push(pix["x"],pix["y"]);
 	var pixMer = geoUtil.lnglat2Pixel(lnglat,zoom);
 	listMector.push(pixMer["x"],pixMer["y"]);

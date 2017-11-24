@@ -1077,34 +1077,36 @@ var Block = {
       _a, _b,
       roof = [];
       
-      console.log(CAM_Z,scale,"ORIGIN_X-->",ORIGIN_X,"ORIGIN_X-->",ORIGIN_Y);
-
+    console.log(CAM_Z,scale,"ORIGIN_X-->",ORIGIN_X,"ORIGIN_X-->",ORIGIN_Y);
     for (var i = 0, il = polygon.length-3; i < il; i += 2) {
       a.x = polygon[i  ]-ORIGIN_X;
       a.y = polygon[i+1]-ORIGIN_Y;
       b.x = polygon[i+2]-ORIGIN_X;
       b.y = polygon[i+3]-ORIGIN_Y;
-
+      console.log(a,b);
       _a = Buildings.project(a, scale);
       _b = Buildings.project(b, scale);
 
 
       // backface culling check
       if ((b.x-a.x) * (_a.y-a.y) > (_a.x-a.x) * (b.y-a.y)) {
-        // depending on direction, set wall shading
         if ((a.x < b.x && a.y < b.y) || (a.x > b.x && a.y > b.y)) {
-          context.fillStyle = altColor;
+          	context.fillStyle = altColor;
         } else {
-          context.fillStyle = color;
+          	context.fillStyle = color;
         }
-
+       
         context.beginPath();
-        this._ring(context, [
+        var data = [
            b.x,  b.y,
            a.x,  a.y,
           _a.x, _a.y,
           _b.x, _b.y
-        ]);
+        ];
+        
+        console.log(data);
+        
+        this._ring(context, data);
         context.closePath();
         context.fill();
       }
@@ -1684,7 +1686,7 @@ function fadeIn() {
     return;
   }
 
-//	animTimer = setInterval(function() {
+	animTimer = setInterval(function() {
 	    var dataItems = Data.items,
 	      isNeeded = false;
 	
@@ -1703,7 +1705,7 @@ function fadeIn() {
 	      clearInterval(animTimer);
 	      animTimer = null;
 	    }
-//	}, 33);
+	}, 33);
 }
 
 var Layers = {
