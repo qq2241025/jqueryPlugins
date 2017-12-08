@@ -92,28 +92,19 @@
 			$('.jtree-node-selected', jtree).removeClass('jtree-node-selected');
 			$(this).addClass('jtree-node-selected');
 			if (opts.onDblClick){
-				var target = this;	// the target HTML DIV element
-				var data = $.data(this, 'jtree-node');
-				opts.onDblClick.call(this, {
-					id: data.id,
-					text: data.text,
-					attributes: data.attributes,
-					target: target
-				});
+				var treeNode = getNode($(this));
+				opts.onDblClick.call(this,treeNode );
 			}
 		}).bind('click.jtree', function(){
 			$('.jtree-node-selected', jtree).removeClass('jtree-node-selected');
 			$(this).addClass('jtree-node-selected');
-			
 			if (opts.onClick){
-				var target = this;	// the target HTML DIV element
-				var data = $.data(this, 'jtree-node');
-				opts.onClick.call(this, {
-					id: data.id,
-					text: data.text,
-					attributes: data.attributes,
-					target: target
-				});
+				var treeNode = getNode($(this));
+				opts.onClick.call(this,treeNode );
+			}
+			if (opts.onSelect){
+				var treeNode = getNode($(this));
+				opts.onSelect.call(this,treeNode );
 			}
 		}).bind('mouseenter.jtree', function(){
 			$(this).addClass('jtree-node-hover');
@@ -219,7 +210,6 @@
 	}
 	
 	function loadData(target, ul, data){
-		// clear the jtree when loading to the root
 		if (target == ul) {
 			$(target).empty();
 		}
@@ -227,23 +217,20 @@
 		function appendNodes(ul, children, depth){
 			for(var i=0; i<children.length; i++){
 				var li = $('<li></li>').appendTo(ul);
-				var item = children[i];
-				
-				// the node state has only 'open' or 'closed' attribute
+				var item = children[i],itemId = item.id;
 				if (item.state != 'open' && item.state != 'closed'){
 					item.state = 'open';
 				}
-				
 				var node = $('<div class="jtree-node"></div>').appendTo(li);
-				node.attr('node-id', item.id);
+				node.attr('node-id', itemId);
 				var iconCls = item["iconCls"] || "";
 				var itemText = opts.formatter.call(target, item);
 				$.data(node[0], 'jtree-node', {
-					id: item.id,
+					id : itemId,
 					text: itemText,
 					iconCls: iconCls,
 					item: item,
-					attributes: item.attributes
+					attributes: item.attributes || ""
 				});
 				
 				$('<span class="jtree-title"></span>').html(itemText).appendTo(node);
@@ -286,10 +273,6 @@
 			showTreeLine(target, target);
 		}, 0);
 	}
-	
-	/**
-	 * request remote data and then load nodes in the <ul> tag.
-	 */
 	function request(target, ul, param){
 		var opts = $.data(target, 'jtree').options;
 		if (!opts.url) return;
@@ -348,7 +331,6 @@
 		return nodes;
 	}
 	/**
-	 * Get the selected node data which contains following properties: id,text,attributes,target
 	 */
 	function getSelectedNode(target){
 		var node = $(target).find('div.jtree-node-selected');
@@ -450,11 +432,13 @@
 		var hit = $('>span.jtree-hit', node);
 		return hit.length == 0;
 	}
-	function getNode(nodeTarget) {
-		var treeNode = $.data(nodeTarget, "jtree-node") || {};
-		treeNode["target"] = nodeTarget;
-		treeNode["checked"] = $(nodeTarget).find(".jtree-checkbox").hasClass("jtree-checkbox1");
-		treeNode["state"] = $(nodeTarget).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed";
+	function getNode(node) {
+		var nodeTarget = node[0]
+		var treeNode = $.extend({}, $.data(nodeTarget, 'jtree-node'), {
+			target : nodeTarget,
+			state  : $(nodeTarget).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed",
+			checked: $(nodeTarget).find('.jtree-checkbox').hasClass('jtree-checkbox1')
+		});
 		return treeNode;
 	};
 	
@@ -529,7 +513,7 @@
 	function findNode(target, id) {
 		var node  = null;
 		var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
-		if(nodeTarget.length) {
+		if(nodeTarget && nodeTarget.length) {
 			node = getNode(nodeTarget[0]);
 		}  
 		return node;
@@ -613,7 +597,7 @@
 				loadTreeData(this, data);
 			});
 		},
-		find: function(target, id) {
+		findNodeById: function(target, id) {
 			return findNode(target[0], id);
 		},
 		getChildren:function(target, param){
@@ -649,3 +633,4 @@
 		onDblClick: function(node){}	// node: id,text,attributes,target
 	};
 })(jQuery);
+

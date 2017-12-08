@@ -5,9 +5,16 @@
   <title>layer-更懂你的web弹窗解决方案</title>
   <script src="js/jquery-1.12.4.js"></script>
   <script src="js/jquery.tree.source.js"></script>
-  <link rel="stylesheet" href="css/default.css" />
+  <script src="js/comboTree.js"></script>
+  <link rel="stylesheet" href="css/black.css" />
 </head>
 <body>
+	<style>
+		.combotree-warpdown{
+			border:1px solid #006DCC;
+			min-height: 120px;
+		}
+	</style>
   <div class="easyui-panel" style="padding:5px">
  		<ul id="tt"></ul>
 	</div>
@@ -38,80 +45,65 @@
 			
 			<br />
 			<button onclick="scrollTo()" id="scrollTo">scrollTo</button>
-			
-			
-			<br />
-			<br /><br /><br />
-			<span class="toolTips" msg="哈哈对额快A" dataTitle="aaaaaaa" title="cccccccc">哈哈对额快A</span>
-			<br /><br /><br />
-	    <span class="toolTips" msg="哈哈对额快B" id="aaaaaa" dataTitle="bbbbb">哈哈对额快B</span>
-	    <br /><br />
-	    
-	    <button onclick="setTipContent()" id="scrollTo">测试toolTip setContent方法</button>
-	    
-	
 	</div>
-	
-	
-	
 	<script type="text/javascript">
 	    var data = [{
 						"id":1,
 						"text":"My Documents",
 						"iconCls":"icon-add",
 						"children":[{
-							"id":11,
+							"id":2,
 							"text":"Photos",
 							"iconCls":"icon-add",
 							"state":"closed",
 							"children":[{
-								"id":111,
+								"id":3,
 								"text":"Friend"
 							},{
-								"id":112,
+								"id":4,
 								"text":"Wife"
 							},{
-								"id":113,
+								"id":5,
 								"text":"Company"
 							}]
 						},{
-							"id":12,
+							"id":6,
 							"text":"Program Files",
 							"iconCls":"icon-add",
 							"children":[{
-								"id":121,
+								"id":7,
 								"iconCls":"icon-add",
 								"text":"Intel"
 							},{
-								"id":122,
+								"id":8,
 								"text":"Java",
 								"attributes":{
 									"p1":"Custom Attribute1",
 									"p2":"Custom Attribute2"
 								}
 							},{
-								"id":123,
+								"id":9,
 								"text":"Microsoft Office"
 							},{
-								"id":124,
+								"id":10,
 								"text":"Games",
 								"checked":true
 							}]
 						},{
-							"id":13,
+							"id":11,
 							"text":"index.html"
 						},{
-							"id":14,
+							"id":12,
 							"text":"about.html"
 						},{
-							"id":15,
+							"id":13,
 							"text":"welcome.html",
 							"children":[{
-								"id":1212,
+								"id":14,
 								"iconCls":"icon-add",
 								"text":"Intel"
 							},{
-								"id":15151,
+								"id":15,
 								"text":"Java",
 								"attributes":{
 									"p1":"Custom Attribute1",
@@ -126,6 +118,9 @@
 		  		lines: true,
 		  		onClick: function(node) {
 		  			console.log("onClick",node);
+		  		},
+		  		onLoadSuccess:function(node){
+		  			console.log("onLoadSuccess",node);
 		  		},
 					onCollapse: function(node) {
 		  			console.log("onCollapse",node);
@@ -147,12 +142,12 @@
 		  			//console.log("onBeforeExpand",node);
 //		  			return false;
 		  		},
-					onCheck: function(node) {
-		  			console.log("onCheck",node);
+					onSelect: function(node) {
+		  			console.log("onSelect",node);
 		  		},
 		  		formatter:function(node){
-		  			var nodeText = node["text"];
-		  			return nodeText;
+		  			 var nodeText = node["text"];
+		  			 return nodeText;
 		  		}
 		  });
 		  
@@ -160,14 +155,7 @@
 		 
 		 var getSelectNode = function(){
 		 	  var node = $('#tt').tree('getSelected');
-		 	  console.log(node);
 		 	  return node;
-		 }
-		 
-		 
-		 setTipContent = function(){
-		 		$("#scrollTo").toolTips("setContent","狗日的");
-		 		$(".toolTips").toolTips("setContent","狗日的,还钱");
 		 }
 		
 		 var getParent = function(){
@@ -294,7 +282,7 @@
 			$('#tt').tree('expandAll');
 		}
 		function expandToNode(){
-			  var node = $('#tt').tree('find',112);
+			  var node = $('#tt').tree('treeNode',112);
 			  console.log(node);
 		 	  if(!node){
 		 	  	alert("没有找到该节点");
@@ -323,10 +311,16 @@
 			$('#tt').tree('loadData',data);
 		}
 		
-		
-		
-		
 	</script>
-
+   
+  <input  id="ComboTree" style="width: 320px;height: 24px;"/>
+  <script>
+	  $("#ComboTree").ComboTree({
+	  	    data: data,
+		  		checkbox: false,
+		  		lines: true
+	  });
+  	
+  </script>
 </body>
 </html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layer-更懂你的web弹窗解决方案</title>
+  <script src="js/jquery-1.12.4.js"></script>
+  <script src="js/jquery.tree.source.js"></script>
+  <script src="js/comboTree.js"></script>
+  <link rel="stylesheet" href="css/black.css" />
+</head>
+<body>
+	<input  id="ComboTree" style="width: 220px;height: 24px;"/>
+	
+	<button id="getValue">getValue</button>
+	<button id="setValue">disabled</button>
+	<button id="disabled">disabled</button>
+	<button id="Enable">Enable</button>
+	
+	<script type="text/javascript">
+	    (function(){
+	    	
+	    	var data = [{
+						"id":1,
+						"text":"My Documents",
+						"iconCls":"icon-add",
+						"children":[{
+							"id":2,
+							"text":"Photos",
+							"iconCls":"icon-add",
+							"state":"closed",
+							"children":[{
+								"id":3,
+								"text":"Friend"
+							},{
+								"id":4,
+								"text":"Wife"
+							},{
+								"id":5,
+								"text":"Company"
+							}]
+						},{
+							"id":6,
+							"text":"Program Files",
+							"iconCls":"icon-add",
+							"children":[{
+								"id":7,
+								"iconCls":"icon-add",
+								"text":"Intel"
+							},{
+								"id":8,
+								"text":"Java",
+								"attributes":{
+									"p1":"Custom Attribute1",
+									"p2":"Custom Attribute2"
+								}
+							},{
+								"id":9,
+								"text":"Microsoft Office"
+							},{
+								"id":10,
+								"text":"Games",
+								"checked":true
+							}]
+						},{
+							"id":11,
+							"text":"index.html"
+						},{
+							"id":12,
+							"text":"about.html"
+						},{
+							"id":13,
+							"text":"welcome.html",
+							"children":[{
+								"id":14,
+								"iconCls":"icon-add",
+								"text":"Intel"
+							},{
+								"id":15,
+								"text":"Java",
+								"attributes":{
+									"p1":"Custom Attribute1",
+									"p2":"Custom Attribute2"
+								}
+							}]
+						}]
+					}];
+		  
+				  $("#ComboTree").ComboTree({
+			  	    	data: data,
+				  		checkbox: false,
+				  		lines: true
+			    });
+			    
+			    
+			    $("#getValue")
+	    	
+	    })();
+	</script>
+</body>
+</html>

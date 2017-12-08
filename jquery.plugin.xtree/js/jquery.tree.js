@@ -718,6 +718,7 @@
 			target: nodeTarget,
 			checked: $(nodeTarget).find(".jtree-checkbox").hasClass("jtree-checkbox1")
 		});
+		console.log(treeNode);
 		if(!isLeaf(treeView, nodeTarget)) {
 			treeNode.state = $(nodeTarget).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed";
 		}
