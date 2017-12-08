@@ -420,20 +420,24 @@
 		showTreeLine(target, target);
 	}
 	
-	function selectNode(target, param){
+	function selectNode(target, nodeTarget){
 		var opts = $.data(target, "jtree").options || {};
 		$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
-		$(param).addClass('jtree-node-selected');
-		var treeNode = getNode($(param));
+		$(nodeTarget).addClass('jtree-node-selected');
+		var treeNode = getNode($(nodeTarget));
 		opts.onSelect.call(target, treeNode);
 	}
+	
+	function unSelectNode(target){
+		$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
+	}
+	
 	function isLeaf(target, param){
 		var node = $(param);
 		var hit = $('>span.jtree-hit', node);
 		return hit.length == 0;
 	}
-	function getNode(node) {
-		var nodeTarget = node[0]
+	function getNode(nodeTarget) {
 		var treeNode = $.extend({}, $.data(nodeTarget, 'jtree-node'), {
 			target : nodeTarget,
 			state  : $(nodeTarget).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed",
@@ -599,6 +603,11 @@
 		},
 		findNodeById: function(target, id) {
 			return findNode(target[0], id);
+		},
+		unSelectAll:function(){
+			return target.each(function(){
+				unSelectAll(this, param);
+			});
 		},
 		getChildren:function(target, param){
 			return  getChildrenTreeNode(target[0],param);
