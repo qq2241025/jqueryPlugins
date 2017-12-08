@@ -3759,7 +3759,7 @@ jQuery( function() {
 	div = null;
 } )();
 var acceptData = function( elem ) {
-	var noData = jQuery.noData[ ( elem.nodeName + " " ).toLowerCase() ],
+		var noData = jQuery.noData[ ( elem.nodeName + " " ).toLowerCase() ],
 		nodeType = +elem.nodeType || 1;
 
 	// Do not set data on non-element DOM nodes because it will not be cleared (#8335).
@@ -3768,6 +3768,7 @@ var acceptData = function( elem ) {
 
 		// Nodes accept data unless otherwise specified; rejection can be conditional
 		!noData || noData !== true && elem.getAttribute( "classid" ) === noData;
+	
 };
 
 

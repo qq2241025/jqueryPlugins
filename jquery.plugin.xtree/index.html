@@ -5,7 +5,6 @@
   <title>layer-更懂你的web弹窗解决方案</title>
   <script src="js/jquery-1.12.4.js"></script>
   <script src="js/jquery.tree.source.js"></script>
-  <script src="js/comboTree.js"></script>
   <link rel="stylesheet" href="css/black.css" />
 </head>
 <body>
@@ -115,46 +114,48 @@
 		  $('#tt').tree({
 		  		data: data,
 		  		checkbox: false,
-		  		lines: true,
-		  		onClick: function(node) {
-		  			console.log("onClick",node);
-		  		},
-		  		onLoadSuccess:function(node){
-		  			console.log("onLoadSuccess",node);
-		  		},
-					onCollapse: function(node) {
-		  			console.log("onCollapse",node);
-		  		},
-					onBeforeCollapse: function(node) {
-		  			console.log("onBeforeCollapse",node);
-//		  			return false;
-		  		},
-					onExpand: function(node) {
-		  			console.log("onExpand",node);
-		  		},
-		  		onMouseOver:function(node){
-		  		//	console.log("onMouseOver",node);
-		  		},
-		  		onMouseOut:function(node){
-		  			//console.log("onMouseOut",node);
-		  		},
-					onBeforeExpand: function(node) {
-		  			//console.log("onBeforeExpand",node);
-//		  			return false;
-		  		},
-					onSelect: function(node) {
-		  			console.log("onSelect",node);
-		  		},
-		  		formatter:function(node){
-		  			 var nodeText = node["text"];
-		  			 return nodeText;
-		  		}
+		  		lines: true
+//		  		onClick: function(node) {
+//		  			console.log("onClick",node);
+//		  		},
+//		  		onLoadSuccess:function(node){
+//		  			console.log("onLoadSuccess",node);
+//		  		},
+//					onCollapse: function(node) {
+//		  			console.log("onCollapse",node);
+//		  		},
+//					onBeforeCollapse: function(node) {
+//		  			console.log("onBeforeCollapse",node);
+////		  			return false;
+//		  		},
+//					onExpand: function(node) {
+//		  			console.log("onExpand",node);
+//		  		},
+//		  		onMouseOver:function(node){
+//		  		//	console.log("onMouseOver",node);
+//		  		},
+//		  		onMouseOut:function(node){
+//		  			//console.log("onMouseOut",node);
+//		  		},
+//					onBeforeExpand: function(node) {
+//		  			//console.log("onBeforeExpand",node);
+////		  			return false;
+//		  		},
+//					onSelect: function(node) {
+//		  			console.log("onSelect",node);
+//		  		},
+//		  		formatter:function(node){
+//		  			 var nodeText = node["text"];
+//		  			 return nodeText;
+//		  		}
 		  });
 		  
 		  
 		 
 		 var getSelectNode = function(){
 		 	  var node = $('#tt').tree('getSelected');
+		 	  console.log(node);
+		 	  alert(node);
 		 	  return node;
 		 }
 		
@@ -184,7 +185,7 @@
 		 }
 		 
 		 function select(){
-		 		var select = $('#tt').tree("select");
+		 		var select = $('#tt').tree("select",1);
 		 		console.log(select);
 		 }
 		 
@@ -282,7 +283,7 @@
 			$('#tt').tree('expandAll');
 		}
 		function expandToNode(){
-			  var node = $('#tt').tree('treeNode',112);
+			  var node = $('#tt').tree('findNodeById',112);
 			  console.log(node);
 		 	  if(!node){
 		 	  	alert("没有找到该节点");
@@ -313,14 +314,5 @@
 		
 	</script>
    
-  <input  id="ComboTree" style="width: 320px;height: 24px;"/>
-  <script>
-	  $("#ComboTree").ComboTree({
-	  	    data: data,
-		  		checkbox: false,
-		  		lines: true
-	  });
-  	
-  </script>
 </body>
 </html>

@@ -27,11 +27,11 @@
 		}
 		return jtree;
 	}
-	function expandNode(target, node){
+	function expandNode(target, nodeTarget){
 		var opts = $.data(target, 'jtree').options;
-		var hit = $('>span.jtree-hit', node);
-		var treeNode = getNode(node);
-		if (hit.length == 0) return;	// is a leaf node
+		var hit = $('>span.jtree-hit', nodeTarget);
+		var treeNode = getNode($(nodeTarget));
+		if (hit.length == 0) return;	//
 		if( opts["onBeforeExpand"].call(target,treeNode) == false){
 			opts["onBeforeExpand"].call(target,treeNode);
 			return ;
@@ -39,7 +39,7 @@
 		if (hit.hasClass('jtree-collapsed')){
 			hit.removeClass('jtree-collapsed jtree-collapsed-hover').addClass('jtree-expanded');
 			hit.next().addClass('jtree-folder-open');
-			var ul = $(node).next();
+			var ul = $(nodeTarget).next();
 			if (ul.length){
 				if (opts.animate){
 					ul.slideDown();
@@ -47,17 +47,17 @@
 					ul.css('display','block');
 				}
 			} else {
-				var id = $.data($(node)[0], 'jtree-node').id;
-				var subul = $('<ul></ul>').insertAfter(node);
+				var id = $.data($(nodeTarget)[0], 'jtree-node').id;
+				var subul = $('<ul></ul>').insertAfter(nodeTarget);
 				request(target, subul, {id:id});	// request children nodes data
 			}
 		}
 		opts.onExpand.call(target, treeNode);
 	}
-	function collapseNode(target, node){
+	function collapseNode(target, nodeTarget){
 		var opts = $.data(target, 'jtree').options;
-		var hit = $('>span.jtree-hit', node);
-		var treeNode = getNode(node);
+		var hit = $('>span.jtree-hit', nodeTarget);
+		var treeNode = getNode($(nodeTarget));
 		if (hit.length == 0) return;	// is a leaf node
 		if( opts["onBeforeCollapse"].call(target,treeNode) == false){
 			opts["onBeforeCollapse"].call(target,treeNode);
@@ -67,21 +67,21 @@
 			hit.removeClass('jtree-expanded jtree-expanded-hover').addClass('jtree-collapsed');
 			hit.next().removeClass('jtree-folder-open');
 			if (opts.animate){
-				$(node).next().slideUp();
+				$(nodeTarget).next().slideUp();
 			} else {
-				$(node).next().css('display','none');
+				$(nodeTarget).next().css('display','none');
 			}
 		}
 		opts.onCollapse.call(target, treeNode);
 	}
 	
-	function toggleNode(target, node){
-		var hit = $('>span.jtree-hit', node);
+	function toggleNode(target, nodeTarget){
+		var hit = $('>span.jtree-hit', nodeTarget);
 		if (hit.length == 0) return;	// is a leaf node
 		if (hit.hasClass('jtree-expanded')){
-			collapseNode(target, node);
+			collapseNode(target, nodeTarget);
 		} else {
-			expandNode(target, node);
+			expandNode(target, nodeTarget);
 		}
 	}
 	
@@ -144,7 +144,7 @@
 				$(this).removeClass('jtree-checkbox2').addClass('jtree-checkbox1');
 			}
 			var nodeTarget = $(this).parent();
-			var treeNode = getNode(nodeTarget);
+			var treeNode = getNode($(nodeTarget));
 			
 			if(opts.onBeforeCheck.call(target, treeNode) == false) {
 				opts.onBeforeCheck.call(target, treeNode)
@@ -309,15 +309,8 @@
 	/**
 	 */
 	function getParentNode(target, param){
-		var node = $(param).parent().parent().prev();
-		if (node.length){
-			return $.extend({}, $.data(node[0], 'jtree-node'), {
-				target: node[0],
-				checked: node.find('.jtree-checkbox').hasClass('jtree-checkbox1')
-			});
-		} else {
-			return null;
-		}
+		var nodeTarget = $(param).parent().parent().prev();
+		return nodeTarget && nodeTarget.length > 0 ? getNode($(nodeTarget)) : null;
 	}
 	function getCheckedNode(target){
 		var nodes = [];
@@ -333,15 +326,8 @@
 	/**
 	 */
 	function getSelectedNode(target){
-		var node = $(target).find('div.jtree-node-selected');
-		if (node.length){
-			return $.extend({}, $.data(node[0], 'jtree-node'), {
-				target: node[0],
-				checked: node.find('.jtree-checkbox').hasClass('jtree-checkbox1')
-			});
-		} else {
-			return null;
-		}
+		var nodeTarget = $(target).find('div.jtree-node-selected');
+		return nodeTarget && nodeTarget.length > 0 ? getNode($(nodeTarget)) : null;
 	}
 	function showTreeLine(target, ul, isFlag) {
 		var opts = $.data(target, "jtree").options;
@@ -389,7 +375,6 @@
 		if (ul.length == 0){
 			ul = $('<ul></ul>').insertAfter(node);
 		}
-		// ensure the node is a folder node
 		if (param.data && param.data.length){
 			var nodeIcon = node.find('span.jtree-file');
 			if (nodeIcon.length){
@@ -420,11 +405,22 @@
 		showTreeLine(target, target);
 	}
 	
-	function selectNode(target, nodeTarget){
-		var opts = $.data(target, "jtree").options || {};
+	function selectNodes(target, dataList){
+		var opts = $.data(target, "jtree").options;
+		
+		if(!dataList || !$.isArray(dataList)){
+		   return new Error(" params is array");
+		}
 		$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
+		if(dataList && dataList.length > 0){
+			$.each(dataList, function(i) {
+				var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
+			});
+		}
+		
+		
 		$(nodeTarget).addClass('jtree-node-selected');
-		var treeNode = getNode($(nodeTarget));
+		var treeNode = findNode($(nodeTarget));
 		opts.onSelect.call(target, treeNode);
 	}
 	
@@ -438,14 +434,15 @@
 		return hit.length == 0;
 	}
 	function getNode(nodeTarget) {
-		var treeNode = $.extend({}, $.data(nodeTarget, 'jtree-node'), {
-			target : nodeTarget,
-			state  : $(nodeTarget).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed",
-			checked: $(nodeTarget).find('.jtree-checkbox').hasClass('jtree-checkbox1')
+		var nodeDom = nodeTarget[0];
+		var cacheData = $.data(nodeTarget[0], 'jtree-node') || {};
+		var treeNode = $.extend({}, cacheData, {
+			target : nodeDom,
+			state  : $(nodeDom).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed",
+			checked: $(nodeDom).find('.jtree-checkbox').hasClass('jtree-checkbox1')
 		});
 		return treeNode;
 	};
-	
 	$.fn.tree = function(options, param){
 		if (typeof options == 'string'){
 			var methodFn = $.fn.tree.methods;
@@ -489,12 +486,11 @@
 		var list = [];
 		$(target).children("li").each(function() {
 			var treeNodeDiv = $(this).children("div.jtree-node");
-			var treeNode = getNode(treeNodeDiv[0]);
+			var treeNode = getNode($(treeNodeDiv));
 			list.push(treeNode);
 		});
 		return list;
 	};
-	
 	function getChildrenTreeNode(treeView,nodeTarget){
 		var treeNodeList = [];
 		if(nodeTarget){
@@ -509,18 +505,14 @@
 		}
 		function getChild(target) {
 			$(target).next().find("div.jtree-node").each(function() {
-				treeNodeList.push(getNode(this));
+				treeNodeList.push(getNode($(this)));
 			});
 		};
 		return treeNodeList;
 	}
 	function findNode(target, id) {
-		var node  = null;
 		var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
-		if(nodeTarget && nodeTarget.length) {
-			node = getNode(nodeTarget[0]);
-		}  
-		return node;
+		return nodeTarget && nodeTarget.length > 0 ? getNode($(nodeTarget)):null;
 	};
 	function expandToTreeNode(treeVide, nodeTarget) {
 		var list = [];
@@ -556,15 +548,11 @@
 		isLeaf:function(target, param){
 			return isLeaf(target[0], param);	
 		},
-		check:function(){
-			
-		},
-		uncheck:function(){
-			
-		},
-		select:function(target, param){
+		check:function(){},
+		uncheck:function(){},
+		selectNodes:function(target, param){
 			return target.each(function(){
-				selectNode(this, param);
+				selectNodes(this, param);
 			});
 		},
 		collapse:function(target, param){
@@ -638,8 +626,7 @@
 		onContextMenu: function(e,node) {},
 		onBeforeCheck: function(node) {},
 		onCheck: function(node) {},
-		onClick: function(node){},	// node: id,text,attributes,target
-		onDblClick: function(node){}	// node: id,text,attributes,target
+		onClick: function(node){},
+		onDblClick: function(node){}	
 	};
 })(jQuery);
-

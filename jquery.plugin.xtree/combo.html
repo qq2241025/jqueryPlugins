@@ -12,7 +12,7 @@
 	<input  id="ComboTree" style="width: 220px;height: 24px;"/>
 	
 	<button id="getValue">getValue</button>
-	<button id="setValue">disabled</button>
+	<button id="setValue">setValue</button>
 	<button id="disabled">disabled</button>
 	<button id="Enable">Enable</button>
 	
@@ -91,8 +91,15 @@
 				  		lines: true
 			    });
 			    
+			    $("#getValue").click(function(){
+			    	  var a = $("#ComboTree").ComboTree("getValue");
+			    	  console.log(a);
+			    });
 			    
-			    $("#getValue")
+			    
+			     $("#setValue").click(function(){
+			    	  $("#ComboTree").ComboTree("setValue",1);
+			    });
 	    	
 	    })();
 	</script>

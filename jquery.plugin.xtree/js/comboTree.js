@@ -124,6 +124,7 @@
 	  			data  : data,
 	  			checkbox : false,
 				onSelect: function(node) {
+					console.log(node);
 					setNodeValue(target,node);
 					me.hidePanel(target);
 					option.onSelect.apply(this, arguments);
@@ -163,6 +164,36 @@
 		  		 }
 	  		});
 	  	}
+	  },
+	  //单个设值
+	 getValue: function(target){
+		return $(target).val();
+	 },
+	 //设置数值
+	 setValue: function(target,value){
+	 	value = value ? value + "": "";
+		var  treeView = $(target).data("combotree").treeView;
+		var  options  = $(target).data("combotree").options;
+		debugger;
+		var valueList = value.split(options["separator"]);
+		if(valueList && valueList.length >1){
+			
+			
+		}else{
+			var treeNode = $(treeView).tree("findNodeById",value);
+			if(treeNode){
+				//选中
+				$(treeView).tree("selectNode",treeNode.target);
+			}
+		}
+	 },
+	 //清除
+	 clear : function(target){
+		var inputText = $(target).data("combotree").inputText;
+		var  treeView = $(target).data("combotree").treeView;
+		$(target).val("");
+		$(inputText).val("");
+		$(treeView).tree("unSelectNode")
 	  }
 	}
 	
@@ -180,28 +211,6 @@
 			combotree.init($(this), options);
 		});
 	};
-	//单个设值
-	var setValue = function(target,id){
-		var  treeView = $(target).data("combotree").treeView;
-		var  options  = $(target).data("combotree").options;
-		var treeNode = $(treeView).tree("findNodeById",id);
-		//清除样式
-		$('.jtree-node-selected', treeView).removeClass('jtree-node-selected');
-		if(treeNode && treeNode.target){
-			//给设置的节点添加选中的样式
-			$(treeNode.target).addClass("jtree-node-selected");
-			$(target).val(id);
-		}
-	}
-	
-	//设置多个数值
-	var  setValues = function(target,values){
-		var  treeView = $(target).data("combotree").treeView;
-		var  options  = $(target).data("combotree").options;
-		$(treeView).tree("getSelected");
-		
-		$(target).ComboTree("setValues", "").ComboTree("setText", "");
-	}
 	
 	$.fn.ComboTree.default = {
 	    method: "POST",
@@ -223,13 +232,11 @@
 	$.fn.ComboTree.method = {
 		setValue: function(target, data){
 			return target.each(function(){
-				setValue(this,data);
+				combotree.setValue(this,data);
 			});
 		},
 		getValue:function(target){
-			return target.each(function(){
-				getValue(this);
-			});
+			return combotree.getValue(target);
 		},
 		expandAll:function(){
 			
@@ -241,7 +248,9 @@
 			
 		},
 		clear:function(){
-			
+			return target.each(function(){
+				combotree.clear(this);
+			});
 		}
 	}
 	
