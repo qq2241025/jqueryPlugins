@@ -10,7 +10,6 @@
 			$(target).hide();
 			var arrayIcon = "position:absolute;left:50%; top:50%;margin-top:-2px;margin-left:-4px;height:4;width:4;border:4px solid;border-color:#777 transparent transparent transparent;";
 			
-
 			
 			var genHtml = [];
 			genHtml.push('<div class="commboTree treeWidget" style="position: relative;">');
@@ -80,12 +79,9 @@
 	         });
 	         //点击效果
 	         $(arrayDiv).click(function(){
-	          	  var isValible = $(warpdownPanel).is(':hidden');　
-	          	  if(isValible){
-	          	   	  me.showPanel(target);
-	          	  }else{
-	          	   	  me.hidePanel(target);
-	          	  }
+	          	  var isValible = $(warpdownPanel).is(':hidden'),inputTextDis = $(inputText).prop("disabled");
+	          	  if(inputTextDis){ return ; }
+	          	  isValible ? me.showPanel(target): me.hidePanel(target);
 	         });
 	         //点击区域的在点击区域外的隐藏
 	         $(document).click(function (e) { 
@@ -124,7 +120,6 @@
 	  			data  : data,
 	  			checkbox : false,
 				onSelect: function(node) {
-					console.log(node);
 					setNodeValue(target,node);
 					me.hidePanel(target);
 					option.onSelect.apply(this, arguments);
@@ -133,6 +128,10 @@
 				   option.onCheck.apply(this, arguments);
 				}
 		  	});
+		  	var val = $(target).val();
+		  	if(val){
+		  		this.setValue(target,val);
+		  	}
 	  },
 	  initTreeView : function(target){
 	  	var option = $(target).data("combotree").options,me= this;
@@ -170,31 +169,48 @@
 		return $(target).val();
 	 },
 	 //设置数值
-	 setValue: function(target,value){
-	 	value = value ? value + "": "";
-		var  treeView = $(target).data("combotree").treeView;
-		var  options  = $(target).data("combotree").options;
-		debugger;
-		var valueList = value.split(options["separator"]);
-		if(valueList && valueList.length >1){
-			
-			
-		}else{
-			var treeNode = $(treeView).tree("findNodeById",value);
-			if(treeNode){
-				//选中
-				$(treeView).tree("selectNode",treeNode.target);
-			}
+	 setValue: function(target,ids){
+	 	ids = ids ? ids + "": "";
+	 	var options  = $(target).data("combotree").options;
+	 	var treeView = $(target).data("combotree").treeView;
+	 	var inputText = $(target).data("combotree").inputText;
+	 	var idList = ids.split(options["separator"]);
+		$(treeView).tree("setSelectNodes",idList);
+		//选中
+		var selectList = $(treeView).tree("getSelected");
+		var itemText = [];
+		if(selectList && selectList.length > 0){
+			$.each(selectList,function(index,record){
+				var text = record["text"];
+				itemText.push(text);
+			});
 		}
+		var itemStr = itemText.join(options["separator"]);
+		$(target).attr("value",ids);
+		$(target).val(ids);
+		$(inputText).val(itemStr);
 	 },
 	 //清除
 	 clear : function(target){
 		var inputText = $(target).data("combotree").inputText;
 		var  treeView = $(target).data("combotree").treeView;
 		$(target).val("");
+		$(target).attr("value","");
 		$(inputText).val("");
-		$(treeView).tree("unSelectNode")
-	  }
+		$(treeView).tree("unSelectAll");
+	 },
+	 disabled:function(target){
+	 	var treeWidget = $(target).data("combotree").treeWidget;
+	 	var inputText = $(target).data("combotree").inputText;
+	 	$(treeWidget).attr("disabled", true);
+	 	$(inputText).attr("disabled", true);
+	 },
+	 enable:function(target){
+	 	var treeWidget = $(target).data("combotree").treeWidget;
+	 	var inputText = $(target).data("combotree").inputText;
+	 	$(treeWidget).attr("disabled", false);
+	 	$(inputText).attr("disabled", false);
+	 }
 	}
 	
 	$.fn.ComboTree = function(options, param){
@@ -227,8 +243,6 @@
 		onCheck :function(){},
 		onSelect:function(){}
 	}
-	
-	
 	$.fn.ComboTree.method = {
 		setValue: function(target, data){
 			return target.each(function(){
@@ -237,6 +251,16 @@
 		},
 		getValue:function(target){
 			return combotree.getValue(target);
+		},
+		disabled: function(target){
+			return target.each(function(){
+				combotree.disabled(this);
+			});
+		},
+		enable: function(target){
+			return target.each(function(){
+				combotree.enable(this);
+			});
 		},
 		expandAll:function(){
 			
@@ -247,7 +271,7 @@
 		destroy:function(){
 			
 		},
-		clear:function(){
+		clear:function(target){
 			return target.each(function(){
 				combotree.clear(this);
 			});

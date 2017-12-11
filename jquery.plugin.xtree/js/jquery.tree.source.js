@@ -27,64 +27,6 @@
 		}
 		return jtree;
 	}
-	function expandNode(target, nodeTarget){
-		var opts = $.data(target, 'jtree').options;
-		var hit = $('>span.jtree-hit', nodeTarget);
-		var treeNode = getNode($(nodeTarget));
-		if (hit.length == 0) return;	//
-		if( opts["onBeforeExpand"].call(target,treeNode) == false){
-			opts["onBeforeExpand"].call(target,treeNode);
-			return ;
-		}
-		if (hit.hasClass('jtree-collapsed')){
-			hit.removeClass('jtree-collapsed jtree-collapsed-hover').addClass('jtree-expanded');
-			hit.next().addClass('jtree-folder-open');
-			var ul = $(nodeTarget).next();
-			if (ul.length){
-				if (opts.animate){
-					ul.slideDown();
-				} else {
-					ul.css('display','block');
-				}
-			} else {
-				var id = $.data($(nodeTarget)[0], 'jtree-node').id;
-				var subul = $('<ul></ul>').insertAfter(nodeTarget);
-				request(target, subul, {id:id});	// request children nodes data
-			}
-		}
-		opts.onExpand.call(target, treeNode);
-	}
-	function collapseNode(target, nodeTarget){
-		var opts = $.data(target, 'jtree').options;
-		var hit = $('>span.jtree-hit', nodeTarget);
-		var treeNode = getNode($(nodeTarget));
-		if (hit.length == 0) return;	// is a leaf node
-		if( opts["onBeforeCollapse"].call(target,treeNode) == false){
-			opts["onBeforeCollapse"].call(target,treeNode);
-			return ;
-		}
-		if (hit.hasClass('jtree-expanded')){
-			hit.removeClass('jtree-expanded jtree-expanded-hover').addClass('jtree-collapsed');
-			hit.next().removeClass('jtree-folder-open');
-			if (opts.animate){
-				$(nodeTarget).next().slideUp();
-			} else {
-				$(nodeTarget).next().css('display','none');
-			}
-		}
-		opts.onCollapse.call(target, treeNode);
-	}
-	
-	function toggleNode(target, nodeTarget){
-		var hit = $('>span.jtree-hit', nodeTarget);
-		if (hit.length == 0) return;	// is a leaf node
-		if (hit.hasClass('jtree-expanded')){
-			collapseNode(target, nodeTarget);
-		} else {
-			expandNode(target, nodeTarget);
-		}
-	}
-	
 	function bindTreeEvents(target){
 		var opts = $.data(target, 'jtree').options;
 		var jtree = $.data(target, 'jtree').jtree;
@@ -92,34 +34,34 @@
 			$('.jtree-node-selected', jtree).removeClass('jtree-node-selected');
 			$(this).addClass('jtree-node-selected');
 			if (opts.onDblClick){
-				var treeNode = getNode($(this));
+				var treeNode = util.getNode($(this));
 				opts.onDblClick.call(this,treeNode );
 			}
 		}).bind('click.jtree', function(){
 			$('.jtree-node-selected', jtree).removeClass('jtree-node-selected');
 			$(this).addClass('jtree-node-selected');
 			if (opts.onClick){
-				var treeNode = getNode($(this));
+				var treeNode = util.getNode($(this));
 				opts.onClick.call(this,treeNode );
 			}
 			if (opts.onSelect){
-				var treeNode = getNode($(this));
+				var treeNode = util.getNode($(this));
 				opts.onSelect.call(this,treeNode );
 			}
 		}).bind('mouseenter.jtree', function(){
 			$(this).addClass('jtree-node-hover');
-			var treeNode = getNode($(this).parent());
+			var treeNode = util.getNode($(this).parent());
 			opts.onMouseOver.call(target, treeNode);
 			return false;
 		}).bind('mouseleave.jtree', function(){
 			$(this).removeClass('jtree-node-hover');
-			var treeNode = getNode($(this).parent());
+			var treeNode = util.getNode($(this).parent());
 			opts.onMouseOut.call(target, treeNode);
 			return false;
 		});
 		$('.jtree-hit', jtree).unbind('.jtree').bind('click.jtree', function(){
 			var node = $(this).parent();
-			toggleNode(target, node);
+			util.toggleNode(target, node);
 			return false;
 		}).bind('mouseenter.jtree', function(){
 			if ($(this).hasClass('jtree-expanded')){
@@ -134,7 +76,6 @@
 				$(this).removeClass('jtree-collapsed-hover');
 			}
 		});
-		
 		$('.jtree-checkbox', jtree).unbind('.jtree').bind('click.jtree', function(){
 			if ($(this).hasClass('jtree-checkbox0')){
 				$(this).removeClass('jtree-checkbox0').addClass('jtree-checkbox1');
@@ -144,21 +85,17 @@
 				$(this).removeClass('jtree-checkbox2').addClass('jtree-checkbox1');
 			}
 			var nodeTarget = $(this).parent();
-			var treeNode = getNode($(nodeTarget));
+			var treeNode = util.getNode($(nodeTarget));
 			
 			if(opts.onBeforeCheck.call(target, treeNode) == false) {
 				opts.onBeforeCheck.call(target, treeNode)
 				return;
 			}
-			
 			setParentCheckbox(nodeTarget);
 			setChildCheckbox(nodeTarget);
-			
 			opts.onCheck.call(target, treeNode);
-			
 			return false;
 		});
-		
 		function setChildCheckbox(node){
 			var childck = node.next().find('.jtree-checkbox');
 			childck.removeClass('jtree-checkbox0 jtree-checkbox1 jtree-checkbox2')
@@ -168,7 +105,6 @@
 				childck.addClass('jtree-checkbox0');
 			}
 		}
-		
 		function setParentCheckbox(node){
 			var pnode = getParentNode(target, node[0]);
 			if (pnode){
@@ -306,29 +242,6 @@
 			bindTreeEvents(target);
 		}
 	}
-	/**
-	 */
-	function getParentNode(target, param){
-		var nodeTarget = $(param).parent().parent().prev();
-		return nodeTarget && nodeTarget.length > 0 ? getNode($(nodeTarget)) : null;
-	}
-	function getCheckedNode(target){
-		var nodes = [];
-		$(target).find('.jtree-checkbox1').each(function(){
-			var node = $(this).parent();
-			nodes.push($.extend({}, $.data(node[0], 'jtree-node'), {
-				target: node[0],
-				checked: node.find('.jtree-checkbox').hasClass('jtree-checkbox1')
-			}));
-		});
-		return nodes;
-	}
-	/**
-	 */
-	function getSelectedNode(target){
-		var nodeTarget = $(target).find('div.jtree-node-selected');
-		return nodeTarget && nodeTarget.length > 0 ? getNode($(nodeTarget)) : null;
-	}
 	function showTreeLine(target, ul, isFlag) {
 		var opts = $.data(target, "jtree").options;
 		if(!opts.lines) {
@@ -367,82 +280,199 @@
 		var nodeLast = $(ul).children("li:last").children("div.jtree-node").addClass("jtree-node-last");
 		nodeLast.children("span.jtree-join").removeClass("jtree-join").addClass("jtree-joinbottom");
 	};
-	/**
-	 */
-	function appendNodes(target, param){
-		var node = $(param.parent);
-		var ul = node.next();
-		if (ul.length == 0){
-			ul = $('<ul></ul>').insertAfter(node);
-		}
-		if (param.data && param.data.length){
-			var nodeIcon = node.find('span.jtree-file');
-			if (nodeIcon.length){
-				nodeIcon.removeClass('jtree-file').addClass('jtree-folder');
-				var hit = $('<span class="jtree-hit jtree-expanded"></span>').insertBefore(nodeIcon);
-				if (hit.prev().length){
-					hit.prev().remove();
+	
+	var util = {
+			getParentNode:function (target, param){
+				var nodeTarget = $(param).parent().parent().prev();
+				return nodeTarget && nodeTarget.length > 0 ? this.getNode($(nodeTarget)) : null;
+			},
+			getCheckedNode:function (target){
+				var nodes = [];
+				$(target).find('.jtree-checkbox1').each(function(){
+					var node = $(this).parent();
+					nodes.push($.extend({}, $.data(node[0], 'jtree-node'), {
+						target: node[0],
+						checked: node.find('.jtree-checkbox').hasClass('jtree-checkbox1')
+					}));
+				});
+				return nodes;
+			},
+			getSelectedNode:function (target){
+				var nodes = [],that =this;
+				$(target).find('div.jtree-node-selected').each(function(){
+					var nodeTarget = $(this),node = that.getNode($(nodeTarget));
+					nodes.push(node);
+				});
+				return nodes;
+			},
+			expandNode:function (target, nodeTarget){
+				var opts = $.data(target, 'jtree').options;
+				var hit = $('>span.jtree-hit', nodeTarget);
+				var treeNode = this.getNode($(nodeTarget));
+				if (hit.length == 0) return;	//
+				if( opts["onBeforeExpand"].call(target,treeNode) == false){
+					opts["onBeforeExpand"].call(target,treeNode);
+					return ;
+				}
+				if (hit.hasClass('jtree-collapsed')){
+					hit.removeClass('jtree-collapsed jtree-collapsed-hover').addClass('jtree-expanded');
+					hit.next().addClass('jtree-folder-open');
+					var ul = $(nodeTarget).next();
+					if (ul.length){
+						if (opts.animate){
+							ul.slideDown();
+						} else {
+							ul.css('display','block');
+						}
+					} else {
+						var id = $.data($(nodeTarget)[0], 'jtree-node').id;
+						var subul = $('<ul></ul>').insertAfter(nodeTarget);
+						request(target, subul, {id:id});	// request children nodes data
+					}
+				}
+				opts.onExpand.call(target, treeNode);
+		},
+		 collapseNode:function (target, nodeTarget){
+			var opts = $.data(target, 'jtree').options;
+			var hit = $('>span.jtree-hit', nodeTarget);
+			var treeNode = this.getNode($(nodeTarget));
+			if (hit.length == 0) return;	// is a leaf node
+			if( opts["onBeforeCollapse"].call(target,treeNode) == false){
+				opts["onBeforeCollapse"].call(target,treeNode);
+				return ;
+			}
+			if (hit.hasClass('jtree-expanded')){
+				hit.removeClass('jtree-expanded jtree-expanded-hover').addClass('jtree-collapsed');
+				hit.next().removeClass('jtree-folder-open');
+				if (opts.animate){
+					$(nodeTarget).next().slideUp();
+				} else {
+					$(nodeTarget).next().css('display','none');
 				}
 			}
-		}
-		loadData(target, ul, param.data);
-		bindTreeEvents(target);
-	}
-	function removeNode(target, param){
-		var node = $(param);
-		var li = node.parent();
-		var ul = li.parent();
-		li.remove();
-		if (ul.find('li').length == 0){
-			var node = ul.prev();
-			node.find('.jtree-folder').removeClass('jtree-folder').addClass('jtree-file');
-			node.find('.jtree-hit').remove();
-			$('<span class="jtree-indent"></span>').prependTo(node);
-			if (ul[0] != target){
-				ul.remove();
+			opts.onCollapse.call(target, treeNode);
+		 },
+		 toggleNode:function(target, nodeTarget){
+			var hit = $('>span.jtree-hit', nodeTarget);
+			if (hit.length == 0) return;	// is a leaf node
+			if (hit.hasClass('jtree-expanded')){
+				this.collapseNode(target, nodeTarget);
+			} else {
+				this.expandNode(target, nodeTarget);
+			}
+		},
+		appendNodes : function(target, param){
+			var node = $(param.parent);
+			var ul = node.next();
+			if (ul.length == 0){
+				ul = $('<ul></ul>').insertAfter(node);
+			}
+			if (param.data && param.data.length){
+				var nodeIcon = node.find('span.jtree-file');
+				if (nodeIcon.length){
+					nodeIcon.removeClass('jtree-file').addClass('jtree-folder');
+					var hit = $('<span class="jtree-hit jtree-expanded"></span>').insertBefore(nodeIcon);
+					if (hit.prev().length){
+						hit.prev().remove();
+					}
+				}
+			}
+			loadData(target, ul, param.data);
+			bindTreeEvents(target);
+		},
+		removeNode: function(target, param){
+			var node = $(param);
+			var li = node.parent();
+			var ul = li.parent();
+			li.remove();
+			if (ul.find('li').length == 0){
+				var node = ul.prev();
+				node.find('.jtree-folder').removeClass('jtree-folder').addClass('jtree-file');
+				node.find('.jtree-hit').remove();
+				$('<span class="jtree-indent"></span>').prependTo(node);
+				if (ul[0] != target){
+					ul.remove();
+				}
+			}
+			showTreeLine(target, target);
+		},
+		setSelectNodes:function(target, ids){
+			var opts = $.data(target, "jtree").options,that = this;;
+			$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
+			if(ids && $.isArray(ids)){
+					$.each(ids, function(index,id) {
+						var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
+						$(nodeTarget).addClass('jtree-node-selected');
+					});
+			}else{
+				var nodeTarget = $(target).find("div.jtree-node[node-id=" + ids + "]");
+				$(nodeTarget).addClass('jtree-node-selected');
+			}
+		},
+		unSelectAll:function(target){
+			$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
+		},
+		isLeaf:function(target, param){
+			var node = $(param);
+			var hit = $('>span.jtree-hit', node);
+			return hit.length == 0;
+		},
+		getNode:function(nodeTarget) {
+			var nodeDom = nodeTarget[0];
+			var cacheData = $.data(nodeTarget[0], 'jtree-node') || {};
+			var treeNode = $.extend({}, cacheData, {
+				target : nodeDom,
+				state  : $(nodeDom).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed",
+				checked: $(nodeDom).find('.jtree-checkbox').hasClass('jtree-checkbox1')
+			});
+			return treeNode;
+		},
+		getRoots:function(target) {
+			var list = [],that =this;
+			$(target).children("li").each(function() {
+				var treeNodeDiv = $(this).children("div.jtree-node");
+				var treeNode = that.getNode($(treeNodeDiv));
+				list.push(treeNode);
+			});
+			return list;
+		},
+		getChildrenTreeNode:function(treeView,nodeTarget){
+			var treeNodeList = [],that =this;
+			if(nodeTarget){
+				getChild(nodeTarget);
+			}else{
+				var rootNode = this.getRoots(treeView);
+				for(var i = 0; i < rootNode.length; i++) {
+					var node = rootNode[i];
+					treeNodeList.push(node);
+					getChild(node.target);
+				}
+			}
+			function getChild(target) {
+				$(target).next().find("div.jtree-node").each(function() {
+					var node = that.getNode($(this));
+					treeNodeList.push(node);
+				});
+			};
+			return treeNodeList;
+		},
+		findNodeById:function(target, id) {
+			var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
+			return nodeTarget && nodeTarget.length > 0 ? this.getNode($(nodeTarget)):null;
+		},
+		expandToTreeNode:function(treeVide, nodeTarget) {
+			var list = [];
+			var p = this.getParentNode(treeVide, nodeTarget);
+			while(p) {
+				list.unshift(p);
+				p = this.getParentNode(treeVide, p.target);
+			}
+			for(var i = 0; i < list.length; i++) {
+				this.expandNode(treeVide, list[i].target);
 			}
 		}
-		showTreeLine(target, target);
-	}
-	
-	function selectNodes(target, dataList){
-		var opts = $.data(target, "jtree").options;
-		
-		if(!dataList || !$.isArray(dataList)){
-		   return new Error(" params is array");
-		}
-		$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
-		if(dataList && dataList.length > 0){
-			$.each(dataList, function(i) {
-				var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
-			});
-		}
-		
-		
-		$(nodeTarget).addClass('jtree-node-selected');
-		var treeNode = findNode($(nodeTarget));
-		opts.onSelect.call(target, treeNode);
-	}
-	
-	function unSelectNode(target){
-		$('div.jtree-node-selected', target).removeClass('jtree-node-selected');
-	}
-	
-	function isLeaf(target, param){
-		var node = $(param);
-		var hit = $('>span.jtree-hit', node);
-		return hit.length == 0;
-	}
-	function getNode(nodeTarget) {
-		var nodeDom = nodeTarget[0];
-		var cacheData = $.data(nodeTarget[0], 'jtree-node') || {};
-		var treeNode = $.extend({}, cacheData, {
-			target : nodeDom,
-			state  : $(nodeDom).find(".jtree-hit").hasClass("jtree-expanded") ? "open" : "closed",
-			checked: $(nodeDom).find('.jtree-checkbox').hasClass('jtree-checkbox1')
-		});
-		return treeNode;
 	};
+	
 	$.fn.tree = function(options, param){
 		if (typeof options == 'string'){
 			var methodFn = $.fn.tree.methods;
@@ -482,49 +512,7 @@
 			bindTreeEvents(this);
 		});
 	};
-	function getRoots(target) {
-		var list = [];
-		$(target).children("li").each(function() {
-			var treeNodeDiv = $(this).children("div.jtree-node");
-			var treeNode = getNode($(treeNodeDiv));
-			list.push(treeNode);
-		});
-		return list;
-	};
-	function getChildrenTreeNode(treeView,nodeTarget){
-		var treeNodeList = [];
-		if(nodeTarget){
-			getChild(nodeTarget);
-		}else{
-			var rootNode = getRoots(treeView);
-			for(var i = 0; i < rootNode.length; i++) {
-				var node = rootNode[i];
-				treeNodeList.push(node);
-				getChild(node.target);
-			}
-		}
-		function getChild(target) {
-			$(target).next().find("div.jtree-node").each(function() {
-				treeNodeList.push(getNode($(this)));
-			});
-		};
-		return treeNodeList;
-	}
-	function findNode(target, id) {
-		var nodeTarget = $(target).find("div.jtree-node[node-id=" + id + "]");
-		return nodeTarget && nodeTarget.length > 0 ? getNode($(nodeTarget)):null;
-	};
-	function expandToTreeNode(treeVide, nodeTarget) {
-		var list = [];
-		var p = getParentNode(treeVide, nodeTarget);
-		while(p) {
-			list.unshift(p);
-			p = getParentNode(treeVide, p.target);
-		}
-		for(var i = 0; i < list.length; i++) {
-			expandNode(treeVide, list[i].target);
-		}
-	};
+	
 	
 	$.fn.tree.methods = {
 		options : function(target, param){
@@ -537,51 +525,46 @@
 			});
 		},
 		getParent:function(target, param){
-			return getParentNode(target[0], param);
+			return util.getParentNode(target[0], param);
 		},
 		getChecked:function(target){
-			return getCheckedNode(target[0]);
+			return util.getCheckedNode(target[0]);
 		},
 		getSelected:function(target){
-			return getSelectedNode(target[0]);
+			return util.getSelectedNode(target[0]);
 		},
 		isLeaf:function(target, param){
-			return isLeaf(target[0], param);	
+			return util.isLeaf(target[0], param);	
 		},
 		check:function(){},
 		uncheck:function(){},
-		selectNodes:function(target, param){
-			return target.each(function(){
-				selectNodes(this, param);
-			});
-		},
 		collapse:function(target, param){
 			return target.each(function(){
-				collapseNode(this, $(param));	
+				util.collapseNode(this, $(param));	
 			});
 		},
 		expand:function(target, param){
 			return target.each(function(){
-				expandNode(this, $(param));
+				util.expandNode(this, $(param));
 			});
 		},
 		append:function(target, param){
 			return target.each(function(){
-				appendNodes(this, param);
+				util.appendNodes(this, param);
 			});
 		},
 		toggle:function(target, param){
 			return target.each(function(){
-				toggleNode(this, $(param));
+				util.toggleNode(this, $(param));
 			});
 		},
 		remove:function(target, param){
 			return target.each(function(){
-				removeNode(this, param);
+				util.removeNode(this, param);
 			});
 		},
 		getRoots:function(target){
-			return  getRoots(target);
+			return  util.getRoots(target);
 		},
 		loadData:function(target, data){
 			return target.each(function() {
@@ -590,19 +573,24 @@
 			});
 		},
 		findNodeById: function(target, id) {
-			return findNode(target[0], id);
+			return util.findNodeById(target[0], id);
 		},
-		unSelectAll:function(){
+		unSelectAll:function(target){
 			return target.each(function(){
-				unSelectAll(this, param);
+				util.unSelectAll(this);
+			});
+		},
+		setSelectNodes:function(target, ids){
+			return target.each(function(){
+				util.setSelectNodes(this, ids);
 			});
 		},
 		getChildren:function(target, param){
-			return  getChildrenTreeNode(target[0],param);
+			return  util.getChildrenTreeNode(target[0],param);
 		},
 		expandTo: function(target, param) {
 			return target.each(function() {
-				expandToTreeNode(this, $(param));
+				util.expandToTreeNode(this, $(param));
 			});
 		}
 	};
@@ -616,7 +604,7 @@
 		},
 		onLoadSuccess: function(){},
 		onLoadError: function(){},
-		onSelect: function(node) {},
+		selectNodes: function(node) {},
 		onCollapse: function(node) {},
 		onBeforeCollapse: function(node) {},
 		onExpand: function(node) {},

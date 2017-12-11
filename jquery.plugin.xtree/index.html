@@ -25,6 +25,8 @@
 			<button onclick="isLeaf()">isLeaf</button>
 			<button onclick="select()">select</button>
 			
+			<button onclick="setSelectNodes()" class="button">setSelectNodes</button>
+			
 			<button onclick="collapse()" class="button">collapse</button>
 			<button onclick="expandNode()" class="button">expand</button>
 			<button onclick="toggle()" class="button">toggle</button>
@@ -157,6 +159,11 @@
 		 	  console.log(node);
 		 	  alert(node);
 		 	  return node;
+		 }
+		 
+		 
+		 var selectNodes = function(){
+		 	   $('#tt').tree('selectNodes',[1,2,3]);
 		 }
 		
 		 var getParent = function(){
