@@ -92,6 +92,7 @@
 .jtree-node-append .jtree-title {
   border: 1px dotted red;
 }
+
 .jtree-node-hover {
   background: #E6E6E6;
   color: #444;
