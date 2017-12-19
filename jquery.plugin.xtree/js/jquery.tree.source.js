@@ -585,8 +585,8 @@
 				util.setSelectNodes(this, ids);
 			});
 		},
-		getChildren:function(target, param){
-			return  util.getChildrenTreeNode(target[0],param);
+		getChildren:function(target, nodeTarget){
+			return  util.getChildrenTreeNode(target[0],nodeTarget);
 		},
 		expandTo: function(target, param) {
 			return target.each(function() {

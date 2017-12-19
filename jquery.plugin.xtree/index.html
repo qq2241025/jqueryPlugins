@@ -156,9 +156,7 @@
 		 
 		 var getSelectNode = function(){
 		 	  var node = $('#tt').tree('getSelected');
-		 	  console.log(node);
-		 	  alert(node);
-		 	  return node;
+		 	  return node[0];
 		 }
 		 
 		 
@@ -268,8 +266,9 @@
 		}
 		
 		var getChildren = function(){
-		 	 var roots =  $('#tt').tree('getChildren');
-		 	 console.log(roots);
+		 	 var node =  getSelectNode();
+		 	 var roots =  $('#tt').tree('getChildren',node.target);
+		 	  console.log("getChildren",node,roots);
 		}
 		
 		var getChildrenNode = function(){

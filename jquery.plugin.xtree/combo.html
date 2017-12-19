@@ -6,113 +6,63 @@
   <script src="js/jquery-1.12.4.js"></script>
   <script src="js/jquery.tree.source.js"></script>
   <script src="js/comboTree.js"></script>
+  <script src="js/combox.js"></script>
   <link rel="stylesheet" href="css/black.css" />
 </head>
 <body>
-	<input  id="ComboTree" style="width: 220px;height: 24px;"/>
 	
-	<button id="getValue">getValue</button>
-	<button id="setValue">setValue</button>
-	<button id="disabled">disabled</button>
-	<button id="Enable">Enable</button>
-	<button id="clear">clear</button>
+	
+	
+	<table width="300px" border="0" >
+		<tr>
+			<td id="labels">账号:</td>
+			<td><input  class="ComboTree" id="test1" style="width: 220px;height: 24px;"/></td>
+		</tr>
+		<tr>
+			<td id="labels">密码:</td>
+			<td><input type="text" id="userPass" dataType="text" name="t2" valType="required" msg="*密码不能为空" maxChart="9" /></td>
+			<td id="labels">电话:</td>
+			<td><input  class="ComboTree" id="test2" style="width: 220px;height: 24px;"/></td>
+		</tr>
+		<tr><td id="labels">手机:</td><td><input type="text"  dataType="text" name="t2" valType="mobile" msg="手机格式不正确" maxChart="11"/></td>
+		<td id="labels">IP:</td><td><input type="text"    dataType="text" name="t2" valType="ip" msg="IP格式不正确" maxChart="11"/></td></tr>
+		<tr><td id="labels">URL:</td><td><input type="text"   dataType="text" name="t2" valType="url" msg="URL格式不正确" maxChart="49"/></td></tr>
+		<tr><td id="labels">电子邮箱:</td><td><input type="text"  dataType="text" name="t2" valType="email" msg="电子邮箱格式不正确" maxChart="11"/></td></tr>
+		<tr><td id="labels">中文姓名:</td><td><input type="text"  dataType="text" name="t2" valType="chinese" msg="中文格式不正确" maxChart="11"/></td></tr>
+		<tr><td id="labels">身份证号码:</td><td><input type="text"  dataType="text" name="t2" valType="identity" msg="身份证号码格式不正确" maxChart="18"/></td></tr>
+		<tr><td id="labels">数字验证码:</td><td><input type="text"  dataType="text" name="t3" valType="number" msg="验证码只能是数字" maxChart="11"/></td></tr>
+		<tr><td id="labels">自定义验证规则-数字:</td>
+			<td>
+					<select class="selectpicker" id="selectBox" style="width:120px">
+						<option value="">--请选择--</option>
+						<option value="1">测试一</option>
+						<option value="2">测试二</option>
+					</select>
+			</td>
+		</tr>
+		<tr><td id="labels">自定义验证规则-数字:</td><td><textarea valType="required" dataType="text" name="t3"  msg="内容不能为空" maxChart="11"></textarea></td></tr>
+		<tr><td id="labels">自定义验证规则-数字:</td><td><input type="text" name="t3" valType="other" regString="^[0-9]*$" msg="自定义规则-数字" maxChart="11" /></td></tr>
+		<tr><td id="labels"><input type="button" value="submit by js" id="btnSave"/></td></tr>
+	</table>
+	
+	
 	<script type="text/javascript">
 	    (function(){
 	    	
-	    	var data = [{
-						"id":1,
-						"text":"My Documents",
-						"iconCls":"icon-add",
-						"children":[{
-							"id":2,
-							"text":"Photos",
-							"iconCls":"icon-add",
-							"state":"closed",
-							"children":[{
-								"id":3,
-								"text":"Friend"
-							},{
-								"id":4,
-								"text":"Wife"
-							},{
-								"id":5,
-								"text":"Company"
-							}]
-						},{
-							"id":6,
-							"text":"Program Files",
-							"iconCls":"icon-add",
-							"children":[{
-								"id":7,
-								"iconCls":"icon-add",
-								"text":"Intel"
-							},{
-								"id":8,
-								"text":"Java",
-								"attributes":{
-									"p1":"Custom Attribute1",
-									"p2":"Custom Attribute2"
-								}
-							},{
-								"id":9,
-								"text":"Microsoft Office"
-							},{
-								"id":10,
-								"text":"Games",
-								"checked":true
-							}]
-						},{
-							"id":11,
-							"text":"index.html"
-						},{
-							"id":12,
-							"text":"about.html"
-						},{
-							"id":13,
-							"text":"welcome.html",
-							"children":[{
-								"id":14,
-								"iconCls":"icon-add",
-								"text":"Intel"
-							},{
-								"id":15,
-								"text":"Java",
-								"attributes":{
-									"p1":"Custom Attribute1",
-									"p2":"Custom Attribute2"
-								}
-							}]
-						}]
-					}];
 		  
-				  $("#ComboTree").ComboTree({
-			  	    	data: data,
+				  $(".ComboTree").ComboTree({
+			  	    url: "data.json",
+			  	    method:"get",
+			  	    params : {user:1,userName:2},
 				  		checkbox: false,
 				  		lines: true
 			    });
 			    
-			    $("#getValue").click(function(){
-			    	  var a = $("#ComboTree").ComboTree("getValue");
-			    	  console.log(a);
+			    $("#selectBox").listBox({
+			    	
+			    	
 			    });
-			    
-			    
-			     $("#setValue").click(function(){
-			    	  $("#ComboTree").ComboTree("setValue","1,2,3,4,5,6");
-			     });
-			     
-			      $("#disabled").click(function(){
-			    	  $("#ComboTree").ComboTree("disabled");
-			     });
-			     
-			      $("#Enable").click(function(){
-			    	  $("#ComboTree").ComboTree("enable");
-			     });
-			     
-			     $("#clear").click(function(){
-			    	  $("#ComboTree").ComboTree("clear");
-			     });
-	    	
+		
 	    })();
 	</script>
 </body>
