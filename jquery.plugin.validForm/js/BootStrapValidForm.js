@@ -3,10 +3,10 @@
 	 * hzg 
 	 */
 	var setContent = function(target,text){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.FormTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 		   var toolTips = dataToolTip["toolTips"];
-		   var content = toolTips.find('.toolTip-Text');
+		   var content = toolTips.find('.formToolTip-Text');
 	       content.html(text);
 	       updatePostion(target,toolTips);
 		}
@@ -17,31 +17,31 @@
 	    updatePostion(target,toolTips);
 	}
 	var destroy = function(target){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.FormTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 			dataToolTip["toolTips"].remove();
-			$(target).removeData("plugin.tooltip");
+			$(target).removeData("plugin.FormTooltip");
 		}
 	}
 	var hide = function(target){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.FormTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 			$(dataToolTip["toolTips"]).hide();
 		}
 	}
 	var show = function(target){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.FormTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 			$(dataToolTip["toolTips"]).show();
 		}
 	}
 	var updatePostion= function(target,toolTips){
 		  toolTips = $(toolTips),target = $(target);
-		  var opts = $(target).data("plugin.tooltip").options;
+		  var opts = $(target).data("plugin.FormTooltip").options;
 		  var TipWidth  = toolTips[0].offsetWidth,TipHeight = toolTips[0].offsetHeight; 
 	      var elementWidth = target[0].offsetWidth,elementHeight = target[0].offsetHeight;
 	      var elementOffset = target.offset();
-	      var innerDiv = toolTips.find('.toolTip-innerDiv'); 
+	      var innerDiv = toolTips.find('.formToolTip-innerDiv'); 
 	      var offsetSize = opts["offsetSize"],iconSize= opts["iconSize"]; //三角大小
 	      switch(opts["align"]){
 	        case 'left':
@@ -88,7 +88,7 @@
 	      }
     };
 	var initToolTip= function(target, opt){
-		  var opts = $.extend({},$.fn.toolTips.default, opt);
+		  var opts = $.extend({},$.fn.toolTips.defaults, opt);
 		  var textContent = $(target).attr("title") || $(target).attr("dataTitle");
 		  if(!textContent){
 		  	  textContent = $(target).attr("msg") || opts["content"];
@@ -96,15 +96,15 @@
 		  	 $(target).attr("dataTitle",textContent);
 		  	 $(target).attr("title","");
 		  }
-		  var htmlcode = '<div class="toolTip"  name="toolTip"><div class="toolTip-innerDiv"></div><div class="toolTip-Text" >'+textContent+'</div></div>';
+		  var htmlcode = '<div class="formToolTip"  name="formToolTip"><div class="formToolTip-innerDiv"></div><div class="formToolTip-Text" >'+textContent+'</div></div>';
 	      var toolTips = $(htmlcode);
 	      toolTips.css({position:"absolute",opacity:opts["opacity"],background:opts["bgColor"],maxWidth:opts["maxWidth"],padding:opts["padding"],borderRadius:opts["radius"]});
-	      toolTips.find("div.toolTip-innerDiv").css({position:"absolute",border:"solid transparent " + opts["iconSize"] +"px",width:"0px",height:"0px"});
-	      toolTips.find("div.toolTip-Text").css({color:opts["textColor"],fontSize:"12px",background:"transparent"});
-	      var data = $.data(target, 'plugin.tooltip');
+	      toolTips.find("div.formToolTip-innerDiv").css({position:"absolute",border:"solid transparent " + opts["iconSize"] +"px",width:"0px",height:"0px"});
+	      toolTips.find("div.formToolTip-Text").css({color:opts["textColor"],fontSize:"12px",background:"transparent"});
+	      var data = $.data(target, 'plugin.FormTooltip');
 	      if(!data){
 	      	  opts["target"] = toolTips;
-			  $(target).data("plugin.tooltip",{
+			  $(target).data("plugin.FormTooltip",{
 			  		options : opts,
 					toolTips : toolTips
 			  })
@@ -126,8 +126,8 @@
       		initToolTip($(this), options);
 		});
 	};
-	$.fn.toolTips.default = {
-		name: 'toolTip', 
+	$.fn.toolTips.defaults = {
+		name: 'formToolTip', 
 	    align: 'right', 
 	    padding: 4,
 	    radius: 2, 
@@ -271,6 +271,16 @@ $(function(){
 		//tip滑动提示
 		hideTip:function(target){
 			$(target).toolTips("destroy");
+		},
+		closeAllToolTip:function(list){
+			 if(list && list.length == 0 ){
+			 	return false;
+			 }
+			 var me =this;
+			 list.each(function(index,target) {
+			 	me.clearFormtErrorTip(target); //清除错误的样式
+			    $(target).toolTips("destroy");
+			 });
 		}
 	}
 	//为jquery扩展一个doValidate方法，对所有带有valType的元素进行表单验证，可用于ajax提交前自动对表单进行验证
@@ -280,7 +290,8 @@ $(function(){
 			return $.Validator.validateForm(list);
 		},
 		closeAllToolTip:function(){
-			$.Validator.closeAllTipDom();
+			var list  = $("[valType]");
+			$.Validator.closeAllToolTip(list);
 		}
 	});
 });
