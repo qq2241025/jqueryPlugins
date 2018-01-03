@@ -40,7 +40,7 @@
 		  var opts = $(target).data("plugin.FormTooltip").options;
 		  var TipWidth  = toolTips[0].offsetWidth,TipHeight = toolTips[0].offsetHeight; 
 	      var elementWidth = target[0].offsetWidth,elementHeight = target[0].offsetHeight;
-	      var elementOffset = target.offset();
+	      var elementOffset = target.position();
 	      var innerDiv = toolTips.find('.formToolTip-innerDiv'); 
 	      var offsetSize = opts["offsetSize"],iconSize= opts["iconSize"]; //三角大小
 	      switch(opts["align"]){
@@ -52,7 +52,7 @@
 	          //div位置
 	          var divTop  = parseInt(elementOffset.top +  (elementHeight - TipHeight)/2);
 	          var divLeft = parseInt(elementOffset.left - TipWidth - iconSize- offsetSize);
-	          toolTips.css({left: divLeft, top: divTop});
+	          toolTips.css({left: divLeft, top: divTop,width:TipWidth});
 	          return ;
 	        case 'right':
 	          //三角
@@ -62,7 +62,7 @@
 	          //div位置
 	          var divTop  = parseInt(elementOffset.top +  (elementHeight - TipHeight)/2);
 	          var divLeft = parseInt(elementOffset.left +  elementWidth + iconSize+ offsetSize) ;
-	          toolTips.css({left: divLeft, top: divTop});
+	          toolTips.css({left: divLeft, top: divTop,width:TipWidth});
 	          return ;
 	        case 'bottom':
 	          //三角
@@ -72,7 +72,7 @@
 	          //div位置
 	          var divLeft = parseInt(elementOffset.left +  (elementWidth - TipWidth) / 2);
 	          var divTop = elementOffset.top + elementHeight +  iconSize + offsetSize ;
-	          toolTips.css({left: divLeft, top: divTop});
+	          toolTips.css({left: divLeft, top: divTop,width:TipWidth});
 	          return ;
 	        case 'top':
 	        default:
@@ -83,7 +83,7 @@
 	          //div位置
 	          var divLeft = parseInt(elementOffset.left +  (elementWidth - TipWidth) / 2);
 	          var divTop = elementOffset.top - TipHeight - iconSize - offsetSize;
-	          toolTips.css({left: divLeft, top: divTop});
+	          toolTips.css({left: divLeft, top: divTop,width:TipWidth});
 	          return ;
 	      }
     };
@@ -98,7 +98,7 @@
 		  }
 		  var htmlcode = '<div class="formToolTip"  name="formToolTip"><div class="formToolTip-innerDiv"></div><div class="formToolTip-Text" >'+textContent+'</div></div>';
 	      var toolTips = $(htmlcode);
-	      toolTips.css({position:"absolute",opacity:opts["opacity"],background:opts["bgColor"],maxWidth:opts["maxWidth"],padding:opts["padding"],borderRadius:opts["radius"]});
+	      toolTips.css({position:"absolute",opacity:opts["opacity"],backgroundColor:opts["bgColor"],maxWidth:opts["maxWidth"],padding:opts["padding"],borderRadius:opts["radius"],zIndex:1000});
 	      toolTips.find("div.formToolTip-innerDiv").css({position:"absolute",border:"solid transparent " + opts["iconSize"] +"px",width:"0px",height:"0px"});
 	      toolTips.find("div.formToolTip-Text").css({color:opts["textColor"],fontSize:"12px",background:"transparent"});
 	      var data = $.data(target, 'plugin.FormTooltip');
@@ -129,7 +129,7 @@
 	$.fn.toolTips.defaults = {
 		name: 'formToolTip', 
 	    align: 'right', 
-	    padding: 4,
+	    padding: "2px 4px",
 	    radius: 2, 
 	    opacity: 0.8, 
 	    iconSize : 6,
@@ -195,14 +195,6 @@ $(function(){
 			}
 			return flag;
 		},
-		getTextWidth:function(str,fontSize) {
-			  var fontSize = fontSize || 12;
-			  var textDom = $('<span stlye="display:none;" id="getTextWidth" style="font-Size:'+fontSize+'px;white-space: nowrap;">'+text+'</span>');
-			  $('body').append(textDom); 
-			  var width = textDom[0].offsetWidth;
-			  textDom.remove();
-		      return width;
-		},
 		//显示错误的tip样式
 		invalidFormErrorTip:function(target){
 			$(target).css({backgroundColor:"#ffe7e7",border:"1px solid #a5aeb6"});
@@ -246,7 +238,8 @@ $(function(){
 		    $(target).toolTips("destroy");
 		 	var option = {
 		 	    align: $(target).attr("placement") || 'right',
-		    	bgColor: $(target).attr("tipColor") || "#000"
+		 	    opacity: 1,
+		    	bgColor: $(target).attr("tipColor") || "#00AB65"
 		 	};
 		 	var flag= this.checkValidItem(target); //控件的验证方法
 	    	if(!flag){
