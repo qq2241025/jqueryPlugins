@@ -96,6 +96,7 @@
 		  	 $(target).attr("dataTitle",textContent);
 		  	 $(target).attr("title","");
 		  }
+		  $(target).parent().css({overflow:"visible"});
 		  var htmlcode = '<div class="formToolTip"  name="formToolTip"><div class="formToolTip-innerDiv"></div><div class="formToolTip-Text" >'+textContent+'</div></div>';
 	      var toolTips = $(htmlcode);
 	      toolTips.css({position:"absolute",opacity:opts["opacity"],backgroundColor:opts["bgColor"],maxWidth:opts["maxWidth"],padding:opts["padding"],borderRadius:opts["radius"],zIndex:1000});
