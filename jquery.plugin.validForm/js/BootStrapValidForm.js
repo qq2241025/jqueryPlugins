@@ -174,6 +174,7 @@ $(function(){
 			var rule = params["rule"].toUpperCase(),value = params["value"];
 			var defaultVal = {
 				NUMBER : "^[0-9]*$",
+				DOUBLE : /^[-\+]?\d+(\.\d+)?$/,
 				TEL : "^0(10|2[0-5789]|\\d{3})-\\d{7,8}$",
 				IP : "^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])\\.){3}(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])$",
 				MOBILE : "^1(3[0-9]|5[0-35-9]|8[0235-9])\\d{8}$",
