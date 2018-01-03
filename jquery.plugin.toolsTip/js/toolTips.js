@@ -4,10 +4,10 @@
 	 * hzg 
 	 */
 	var setContent = function(target,text){
-	    var dataToolTip = $(target).data("plugin.tooltip");
+	    var dataToolTip = $(target).data("plugin.formTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 		   var toolTips = dataToolTip["toolTips"];
-		   var content = toolTips.find('.toolTip-Text');
+		   var content = toolTips.find('.formToolTip-Text');
 	       content.html(text);
 	       updatePostion(target,toolTips);
 		}
@@ -19,31 +19,31 @@
 	    updatePostion(target,toolTips);
 	}
 	var destroy = function(target){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.formTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 			dataToolTip["toolTips"].remove();
-			$(target).removeData("plugin.tooltip");
+			$(target).removeData("plugin.formTooltip");
 		}
 	}
 	var hide = function(target){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.formTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 			$(dataToolTip["toolTips"]).hide();
 		}
 	}
 	var show = function(target){
-		var dataToolTip = $(target).data("plugin.tooltip");
+		var dataToolTip = $(target).data("plugin.formTooltip");
 		if(dataToolTip && dataToolTip["toolTips"]){
 			$(dataToolTip["toolTips"]).show();
 		}
 	}
 	var updatePostion= function(target,toolTips){
 		  toolTips = $(toolTips),target = $(target);
-		  var opts = $(target).data("plugin.tooltip").options;
+		  var opts = $(target).data("plugin.formTooltip").options;
 		  var TipWidth  = toolTips[0].offsetWidth,TipHeight = toolTips[0].offsetHeight; 
 	      var elementWidth = target[0].offsetWidth,elementHeight = target[0].offsetHeight;
 	      var elementOffset = target.offset();
-	      var innerDiv = toolTips.find('.toolTip-innerDiv'); 
+	      var innerDiv = toolTips.find('.formToolTip-innerDiv'); 
 	      var offsetSize = opts["offsetSize"],iconSize= opts["iconSize"]; //三角大小
 	      switch(opts["align"]){
 	        case 'left':
@@ -98,15 +98,15 @@
 		  	 $(target).attr("dataTitle",textContent);
 		  	 $(target).attr("title","");
 		  }
-		  var htmlcode = '<div class="toolTip"  name="toolTip"><div class="toolTip-innerDiv"></div><div class="toolTip-Text" >'+textContent+'</div></div>';
+		  var htmlcode = '<div class="formToolTip"  name="formToolTip"><div class="formToolTip-innerDiv"></div><div class="formToolTip-Text" >'+textContent+'</div></div>';
 	      var toolTips = $(htmlcode);
 	      toolTips.css({position:"absolute",opacity:opts["opacity"],background:opts["bgColor"],maxWidth:opts["maxWidth"],padding:opts["padding"],borderRadius:opts["radius"]});
-	      toolTips.find("div.toolTip-innerDiv").css({position:"absolute",border:"solid transparent " + opts["iconSize"] +"px",width:"0px",height:"0px"});
-	      toolTips.find("div.toolTip-Text").css({color:opts["textColor"],fontSize:"12px",background:"transparent"});
-	      var data = $.data(target, 'plugin.tooltip');
+	      toolTips.find("div.formToolTip-innerDiv").css({position:"absolute",border:"solid transparent " + opts["iconSize"] +"px",width:"0px",height:"0px"});
+	      toolTips.find("div.formToolTip-Text").css({color:opts["textColor"],fontSize:"12px",background:"transparent"});
+	      var data = $.data(target, 'plugin.formTooltip');
 	      if(!data){
 	      	  opts["target"] = toolTips;
-			  $(target).data("plugin.tooltip",{
+			  $(target).data("plugin.formTooltip",{
 			  		options : opts,
 					toolTips : toolTips
 			  })
@@ -132,7 +132,7 @@
 	};
 	
 	$.fn.toolTips.default = {
-		name: 'toolTip', 
+		name: 'formToolTip', 
 	    align: 'right', 
 	    padding: 4,
 	    radius: 2, 
