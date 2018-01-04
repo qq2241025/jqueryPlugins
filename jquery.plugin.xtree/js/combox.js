@@ -100,9 +100,10 @@
 	  		var me = this,listBox = $(target).data("listBox").selectBox;
 	  		var warpdown  = $("div.boxWarpdown",listBox);
 	  	    var listOption= $("li.boxOption",listBox);
-			console.log(listOption);
 			$(listOption).click(function(){
-				console.log(this);
+				var val  = $(this).attr("value");
+				var text = $(this).attr("text");
+				
 			})
 	  },
 	  _loadData:function(target,data){
@@ -114,7 +115,7 @@
 	  	    for(var i =0;i<data.length; i++){
 	  	    	var record = data[i];
 	  	    	var text = record[textField],value = record[valueField]
-	  	    	$(boxOptUl).append("<li value='"+value+"' class='boxOption'>"+text+"</li>");
+	  	    	$(boxOptUl).append("<li class='boxOption' text='"+text+"' value='"+value+"' >"+text+"</li>");
 	  	    }
 	  	    this.doDataEventHander(target);
 		  	var val = $(target).val();
@@ -167,7 +168,22 @@
 		return $(target).val();
 	 },
 	 //设置数值
-	 setValue: function(target,ids){},
+	 setValue: function(target,ids){
+	 	 var selectBox = $(target).data("listBox").selectBox;
+	 	 var inputText = $("input.boxText",selectBox);
+	 	 var selectList = $(treeView).tree("getSelected");
+	 	 var itemText = [];
+		 if(selectList && selectList.length > 0){
+			$.each(selectList,function(index,record){
+				var text = record["text"];
+				itemText.push(text);
+			});
+		 }
+		 var itemStr = itemText.join(options["separator"]);
+	 	 $(target).attr("value",ids);
+		 $(target).val(ids);
+		 $(inputText).val(itemStr);
+	 },
 	 //清除
 	 clear : function(target){
 		 
